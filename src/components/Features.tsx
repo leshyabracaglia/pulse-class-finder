@@ -1,37 +1,37 @@
 
-import { Calendar, Clock, Users, Smartphone, Award, Heart } from "lucide-react";
+import { Calendar, Clock, Users, Smartphone, BarChart3, Settings } from "lucide-react";
 
 const Features = () => {
   const features = [
     {
       icon: Calendar,
-      title: "Easy Scheduling",
-      description: "Book classes up to 30 days in advance with our intuitive calendar system"
+      title: "Schedule Management",
+      description: "View and manage class schedules with an intuitive calendar interface"
     },
     {
       icon: Clock,
-      title: "Real-time Updates",
-      description: "Get instant notifications about class changes, cancellations, and availability"
+      title: "Real-time Availability",
+      description: "See current class capacity and availability status instantly"
     },
     {
       icon: Users,
-      title: "Community Focused",
-      description: "Connect with fellow fitness enthusiasts and build lasting workout partnerships"
+      title: "Member Management",
+      description: "Track member bookings and manage class rosters efficiently"
     },
     {
       icon: Smartphone,
-      title: "Mobile Friendly",
-      description: "Access your workout schedule anywhere with our responsive mobile design"
+      title: "Mobile Access",
+      description: "Access the system from any device with responsive design"
     },
     {
-      icon: Award,
-      title: "Expert Instructors",
-      description: "Learn from certified professionals with years of experience in their specialties"
+      icon: BarChart3,
+      title: "Analytics Dashboard",
+      description: "Monitor class popularity and booking patterns with detailed reports"
     },
     {
-      icon: Heart,
-      title: "Track Progress",
-      description: "Monitor your fitness journey and celebrate milestones with our tracking tools"
+      icon: Settings,
+      title: "Administrative Tools",
+      description: "Configure classes, manage instructors, and customize booking rules"
     }
   ];
 
@@ -39,9 +39,9 @@ const Features = () => {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose FitBook?</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We've designed every feature with your fitness journey in mind, making it easier than ever to stay consistent and motivated
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">System Features</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Comprehensive tools for managing fitness class bookings and operations
           </p>
         </div>
 
@@ -49,13 +49,13 @@ const Features = () => {
           {features.map((feature, index) => (
             <div 
               key={index} 
-              className="text-center p-6 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:scale-105 group"
+              className="text-center p-6 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-300"
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4">
+                <feature.icon className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>

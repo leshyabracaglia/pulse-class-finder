@@ -1,48 +1,42 @@
 
-import { Heart } from "lucide-react";
-
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white py-12">
+    <footer className="bg-gray-50 border-t border-gray-200 py-12">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
-            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              FitBook
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              FitBook Pro
             </h3>
-            <p className="text-gray-400 mb-4 max-w-md">
-              Your ultimate fitness companion. Book classes, track progress, and achieve your health goals with our comprehensive platform.
+            <p className="text-gray-600 mb-4 max-w-md text-sm">
+              Professional class booking and management system for fitness facilities. 
+              Streamline operations and improve member experience.
             </p>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <span>Made with</span>
-              <Heart className="w-4 h-4 text-red-500" />
-              <span>for fitness enthusiasts</span>
-            </div>
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Classes</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Instructors</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">System</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li><a href="#" className="hover:text-gray-900 transition-colors">Dashboard</a></li>
+              <li><a href="#" className="hover:text-gray-900 transition-colors">Classes</a></li>
+              <li><a href="#" className="hover:text-gray-900 transition-colors">Members</a></li>
+              <li><a href="#" className="hover:text-gray-900 transition-colors">Reports</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="text-lg font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Support</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li><a href="#" className="hover:text-gray-900 transition-colors">Documentation</a></li>
+              <li><a href="#" className="hover:text-gray-900 transition-colors">API Reference</a></li>
+              <li><a href="#" className="hover:text-gray-900 transition-colors">Contact Support</a></li>
+              <li><a href="#" className="hover:text-gray-900 transition-colors">System Status</a></li>
             </ul>
           </div>
         </div>
         
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 FitBook. All rights reserved.</p>
+        <div className="border-t border-gray-200 mt-8 pt-8 text-center">
+          <p className="text-sm text-gray-500">&copy; 2024 FitBook Pro. All rights reserved.</p>
         </div>
       </div>
     </footer>
