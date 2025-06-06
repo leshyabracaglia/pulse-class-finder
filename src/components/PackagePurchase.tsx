@@ -58,7 +58,10 @@ const PackagePurchase = ({ companyId }: PackagePurchaseProps) => {
       const { data, error } = await query;
 
       if (error) throw error;
-      setPackages(data || []);
+      setPackages((data || []).map(pkg => ({
+        ...pkg,
+        package_type: pkg.package_type as 'class_count' | 'time_based'
+      })));
     } catch (error) {
       console.error('Error fetching packages:', error);
       toast({

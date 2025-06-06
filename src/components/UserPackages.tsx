@@ -64,7 +64,13 @@ const UserPackages = () => {
         .order('purchased_at', { ascending: false });
 
       if (error) throw error;
-      setUserPackages(data || []);
+      setUserPackages((data || []).map(pkg => ({
+        ...pkg,
+        packages: {
+          ...pkg.packages,
+          package_type: pkg.packages.package_type as 'class_count' | 'time_based'
+        }
+      })));
     } catch (error) {
       console.error('Error fetching user packages:', error);
       toast({
