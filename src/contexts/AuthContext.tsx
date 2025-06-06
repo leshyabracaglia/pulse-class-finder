@@ -30,10 +30,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Check if user is a company when they sign in
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Defer the company check to avoid potential deadlocks
+          setTimeout(async () => {
+            try {
+              const { data: companyData } = await supabase
+                .from('companies')
+                .select('id')
+                .eq('user_id', session.user.id)
+                .single();
+
+              // If company exists and we're not already on company dashboard, redirect
+              if (companyData && !window.location.pathname.includes('company-dashboard')) {
+                window.location.href = '/company-dashboard';
+              }
+            } catch (error) {
+              // If no company found or error, continue to regular dashboard
+              console.log('No company profile found, continuing to user dashboard');
+            }
+          }, 100);
+        }
       }
     );
 

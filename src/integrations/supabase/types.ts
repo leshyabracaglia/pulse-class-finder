@@ -46,6 +46,7 @@ export type Database = {
           class_date: string
           class_time: string
           class_type: string
+          company_id: string | null
           created_at: string | null
           current_bookings: number
           difficulty: string | null
@@ -59,6 +60,7 @@ export type Database = {
           class_date: string
           class_time: string
           class_type: string
+          company_id?: string | null
           created_at?: string | null
           current_bookings?: number
           difficulty?: string | null
@@ -72,6 +74,7 @@ export type Database = {
           class_date?: string
           class_time?: string
           class_type?: string
+          company_id?: string | null
           created_at?: string | null
           current_bookings?: number
           difficulty?: string | null
@@ -80,6 +83,56 @@ export type Database = {
           instructor?: string
           max_capacity?: number
           title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          address: string | null
+          company_name: string
+          contact_email: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_approved: boolean | null
+          phone: string | null
+          updated_at: string | null
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          company_name: string
+          contact_email: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_approved?: boolean | null
+          phone?: string | null
+          updated_at?: string | null
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          company_name?: string
+          contact_email?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_approved?: boolean | null
+          phone?: string | null
+          updated_at?: string | null
+          user_id?: string
+          website?: string | null
         }
         Relationships: []
       }

@@ -1,64 +1,72 @@
 
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Users } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Hero = () => {
   const { user } = useAuth();
 
   return (
-    <section className="bg-slate-50 border-b border-gray-200 py-16">
-      <div className="container mx-auto px-4">
+    <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 text-white min-h-screen flex items-center">
+      <div className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Class Booking System
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Transform Your
+            <span className="text-yellow-300"> Fitness Journey</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Manage your workout schedule efficiently. View available classes, check capacity, and book your sessions.
+          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+            Discover amazing fitness classes from top wellness companies. From yoga to HIIT, 
+            find the perfect workout that fits your schedule and goals.
           </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-2 text-gray-700">
-              <Calendar className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium">Schedule Management</span>
-            </div>
-            <div className="flex items-center justify-center gap-2 text-gray-700">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium">Real-time Updates</span>
-            </div>
-            <div className="flex items-center justify-center gap-2 text-gray-700">
-              <Users className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium">Capacity Tracking</span>
-            </div>
-          </div>
-          
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-              onClick={() => document.getElementById('classes')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:scale-105"
+              onClick={() => {
+                const classesSection = document.getElementById('classes');
+                if (classesSection) {
+                  classesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
             >
-              View Available Classes
+              Browse Classes
             </Button>
-            {user ? (
+            {!user && (
+              <>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300"
+                  onClick={() => window.location.href = '/auth'}
+                >
+                  Sign Up Today
+                </Button>
+              </>
+            )}
+            {user && (
               <Button 
                 size="lg" 
-                variant="outline"
-                className="px-8 py-3"
+                variant="outline" 
+                className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300"
                 onClick={() => window.location.href = '/dashboard'}
               >
                 My Dashboard
               </Button>
-            ) : (
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="px-8 py-3"
-                onClick={() => window.location.href = '/auth'}
-              >
-                Sign In
-              </Button>
             )}
+          </div>
+          
+          {/* Call to action for companies */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold mb-3">Are you a wellness company?</h3>
+            <p className="text-blue-100 mb-4">
+              Join our platform to showcase your fitness classes and connect with health-conscious customers.
+            </p>
+            <Button 
+              variant="secondary"
+              className="bg-white text-blue-600 hover:bg-blue-50"
+              onClick={() => window.location.href = '/auth'}
+            >
+              List Your Classes
+            </Button>
           </div>
         </div>
       </div>
