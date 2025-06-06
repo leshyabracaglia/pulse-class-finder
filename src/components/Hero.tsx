@@ -1,8 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Hero = () => {
+  const { user } = useAuth();
+
   return (
     <section className="bg-slate-50 border-b border-gray-200 py-16">
       <div className="container mx-auto px-4">
@@ -29,12 +32,34 @@ const Hero = () => {
             </div>
           </div>
           
-          <Button 
-            size="lg" 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
-          >
-            View Available Classes
-          </Button>
+          <div className="flex gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+              onClick={() => document.getElementById('classes')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              View Available Classes
+            </Button>
+            {user ? (
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="px-8 py-3"
+                onClick={() => window.location.href = '/dashboard'}
+              >
+                My Dashboard
+              </Button>
+            ) : (
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="px-8 py-3"
+                onClick={() => window.location.href = '/auth'}
+              >
+                Sign In
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </section>
