@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -79,11 +78,19 @@ const UserDashboard = () => {
 
       if (error) throw error;
 
-      // Update current_bookings count
-      const { error: updateError } = await supabase.rpc(
-        'decrement_class_bookings',
-        { class_id: classId }
-      );
+      // Update current_bookings count by decrementing it
+      const { data: classData, error: fetchError } = await supabase
+        .from('classes')
+        .select('current_bookings')
+        .eq('id', classId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      const { error: updateError } = await supabase
+        .from('classes')
+        .update({ current_bookings: Math.max(0, classData.current_bookings - 1) })
+        .eq('id', classId);
 
       if (updateError) console.error('Error updating class capacity:', updateError);
 

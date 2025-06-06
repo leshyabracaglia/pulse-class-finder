@@ -1,4 +1,3 @@
-
 import ClassCard from "./ClassCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
@@ -11,7 +10,7 @@ interface ClassData {
   class_time: string;
   class_date: string;
   duration_minutes: number;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | null;
   class_type: string;
   max_capacity: number;
   current_bookings: number;
@@ -49,8 +48,8 @@ const ClassSchedule = () => {
 
       if (tomorrowError) throw tomorrowError;
 
-      setTodayClasses(todayData || []);
-      setTomorrowClasses(tomorrowData || []);
+      setTodayClasses((todayData || []) as ClassData[]);
+      setTomorrowClasses((tomorrowData || []) as ClassData[]);
     } catch (error) {
       console.error('Error fetching classes:', error);
     } finally {
@@ -95,7 +94,7 @@ const ClassSchedule = () => {
                   time={classItem.class_time}
                   date={classItem.class_date}
                   duration={classItem.duration_minutes}
-                  difficulty={classItem.difficulty}
+                  difficulty={classItem.difficulty || 'Beginner'}
                   spotsLeft={classItem.max_capacity - classItem.current_bookings}
                   type={classItem.class_type}
                   maxCapacity={classItem.max_capacity}
@@ -116,7 +115,7 @@ const ClassSchedule = () => {
                   time={classItem.class_time}
                   date={classItem.class_date}
                   duration={classItem.duration_minutes}
-                  difficulty={classItem.difficulty}
+                  difficulty={classItem.difficulty || 'Beginner'}
                   spotsLeft={classItem.max_capacity - classItem.current_bookings}
                   type={classItem.class_type}
                   maxCapacity={classItem.max_capacity}
