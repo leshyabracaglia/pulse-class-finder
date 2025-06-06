@@ -136,6 +136,56 @@ export type Database = {
         }
         Relationships: []
       }
+      packages: {
+        Row: {
+          class_count: number | null
+          company_id: string
+          created_at: string
+          description: string | null
+          duration_days: number | null
+          id: string
+          is_active: boolean
+          name: string
+          package_type: string
+          price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          class_count?: number | null
+          company_id: string
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          package_type: string
+          price_cents: number
+          updated_at?: string
+        }
+        Update: {
+          class_count?: number | null
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          package_type?: string
+          price_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -159,6 +209,57 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      user_packages: {
+        Row: {
+          company_id: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          package_id: string
+          purchased_at: string
+          remaining_classes: number | null
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          package_id: string
+          purchased_at?: string
+          remaining_classes?: number | null
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          package_id?: string
+          purchased_at?: string
+          remaining_classes?: number | null
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_packages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_packages_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
