@@ -48,38 +48,34 @@ export default function AuthProvider({
       setUser(session?.user ?? null);
       setLoading(false);
 
-      // Only handle redirects for sign-in events, not general auth state changes
+      // Only handle redirects for actual sign-in events from the auth page
       if (event === "SIGNED_IN" && session?.user) {
-        // Defer the company check to avoid potential deadlocks
-        setTimeout(async () => {
-          try {
-            const { data: companyData } = await supabase
-              .from("companies")
-              .select("id")
-              .eq("user_id", session.user.id)
-              .single();
+        const currentPath = window.location.pathname;
+        
+        // Only redirect if we're coming from the auth page
+        if (currentPath === "/auth") {
+          // Defer the company check to avoid potential deadlocks
+          setTimeout(async () => {
+            try {
+              const { data: companyData } = await supabase
+                .from("companies")
+                .select("id")
+                .eq("user_id", session.user.id)
+                .single();
 
-            // Only redirect if company exists AND we're currently on auth page or root
-            const currentPath = window.location.pathname;
-            if (
-              companyData &&
-              (currentPath === "/auth" || currentPath === "/")
-            ) {
-              console.log("Redirecting company user to company dashboard");
-              window.location.href = "/company-dashboard";
-            } else if (!companyData && currentPath === "/auth") {
-              // Regular user, redirect to main page only if on auth page
-              console.log("Redirecting regular user to main page");
+              if (companyData) {
+                console.log("Redirecting company user to company dashboard");
+                window.location.href = "/company-dashboard";
+              } else {
+                console.log("Redirecting regular user to main page");
+                window.location.href = "/";
+              }
+            } catch (error) {
+              console.log("No company profile found, redirecting to main page");
               window.location.href = "/";
             }
-          } catch (error) {
-            // If no company found or error, only redirect if on auth page
-            console.log("No company profile found or error, staying on current page");
-            if (window.location.pathname === "/auth") {
-              window.location.href = "/";
-            }
-          }
-        }, 100);
+          }, 100);
+        }
       }
     });
 
