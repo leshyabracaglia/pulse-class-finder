@@ -1,17 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Clock, Users, User, Plus, Edit, Trash2, Building, Package } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import PackageManager from './PackageManager';
+import React, { useEffect, useState } from "react";
+import { useAuthContext } from "@/providers/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Calendar,
+  Clock,
+  Users,
+  User,
+  Plus,
+  Edit,
+  Trash2,
+  Building,
+  Package,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import PackageManager from "./PackageManager";
 
 interface Company {
   id: string;
@@ -38,7 +60,7 @@ interface ClassData {
 }
 
 const CompanyDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useAuthContext();
   const [company, setCompany] = useState<Company | null>(null);
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,13 +69,13 @@ const CompanyDashboard = () => {
   const { toast } = useToast();
 
   // Form states for adding/editing classes
-  const [title, setTitle] = useState('');
-  const [instructor, setInstructor] = useState('');
-  const [classTime, setClassTime] = useState('');
-  const [classDate, setClassDate] = useState('');
+  const [title, setTitle] = useState("");
+  const [instructor, setInstructor] = useState("");
+  const [classTime, setClassTime] = useState("");
+  const [classDate, setClassDate] = useState("");
   const [duration, setDuration] = useState(60);
-  const [difficulty, setDifficulty] = useState('Beginner');
-  const [classType, setClassType] = useState('');
+  const [difficulty, setDifficulty] = useState("Beginner");
+  const [classType, setClassType] = useState("");
   const [maxCapacity, setMaxCapacity] = useState(20);
 
   useEffect(() => {
@@ -66,15 +88,15 @@ const CompanyDashboard = () => {
     try {
       // Fetch company data
       const { data: companyData, error: companyError } = await supabase
-        .from('companies')
-        .select('*')
-        .eq('user_id', user?.id)
+        .from("companies")
+        .select("*")
+        .eq("user_id", user?.id)
         .single();
 
       if (companyError) {
-        if (companyError.code === 'PGRST116') {
+        if (companyError.code === "PGRST116") {
           // No company found, redirect to regular dashboard
-          window.location.href = '/dashboard';
+          window.location.href = "/dashboard";
           return;
         }
         throw companyError;
@@ -84,15 +106,15 @@ const CompanyDashboard = () => {
 
       // Fetch company's classes
       const { data: classesData, error: classesError } = await supabase
-        .from('classes')
-        .select('*')
-        .eq('company_id', companyData.id)
-        .order('class_date', { ascending: true });
+        .from("classes")
+        .select("*")
+        .eq("company_id", companyData.id)
+        .order("class_date", { ascending: true });
 
       if (classesError) throw classesError;
       setClasses(classesData || []);
     } catch (error) {
-      console.error('Error fetching company data:', error);
+      console.error("Error fetching company data:", error);
       toast({
         title: "Error",
         description: "Failed to load company data.",
@@ -104,13 +126,13 @@ const CompanyDashboard = () => {
   };
 
   const resetForm = () => {
-    setTitle('');
-    setInstructor('');
-    setClassTime('');
-    setClassDate('');
+    setTitle("");
+    setInstructor("");
+    setClassTime("");
+    setClassDate("");
     setDuration(60);
-    setDifficulty('Beginner');
-    setClassType('');
+    setDifficulty("Beginner");
+    setClassType("");
     setMaxCapacity(20);
     setEditingClass(null);
     setShowAddClass(false);
@@ -136,9 +158,9 @@ const CompanyDashboard = () => {
 
       if (editingClass) {
         const { error } = await supabase
-          .from('classes')
+          .from("classes")
           .update(classData)
-          .eq('id', editingClass.id);
+          .eq("id", editingClass.id);
 
         if (error) throw error;
         toast({
@@ -146,9 +168,7 @@ const CompanyDashboard = () => {
           description: "Class updated successfully.",
         });
       } else {
-        const { error } = await supabase
-          .from('classes')
-          .insert(classData);
+        const { error } = await supabase.from("classes").insert(classData);
 
         if (error) throw error;
         toast({
@@ -160,7 +180,7 @@ const CompanyDashboard = () => {
       resetForm();
       fetchCompanyData();
     } catch (error) {
-      console.error('Error saving class:', error);
+      console.error("Error saving class:", error);
       toast({
         title: "Error",
         description: "Failed to save class.",
@@ -183,13 +203,13 @@ const CompanyDashboard = () => {
   };
 
   const handleDeleteClass = async (classId: string) => {
-    if (!confirm('Are you sure you want to delete this class?')) return;
+    if (!confirm("Are you sure you want to delete this class?")) return;
 
     try {
       const { error } = await supabase
-        .from('classes')
+        .from("classes")
         .delete()
-        .eq('id', classId);
+        .eq("id", classId);
 
       if (error) throw error;
 
@@ -200,7 +220,7 @@ const CompanyDashboard = () => {
 
       fetchCompanyData();
     } catch (error) {
-      console.error('Error deleting class:', error);
+      console.error("Error deleting class:", error);
       toast({
         title: "Error",
         description: "Failed to delete class.",
@@ -228,7 +248,7 @@ const CompanyDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => window.location.href = '/dashboard'}>
+            <Button onClick={() => (window.location.href = "/dashboard")}>
               Go to User Dashboard
             </Button>
           </CardContent>
@@ -244,12 +264,17 @@ const CompanyDashboard = () => {
           <div className="flex items-center gap-3">
             <Building className="w-8 h-8 text-blue-600" />
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">Company Dashboard</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Company Dashboard
+              </h1>
               <p className="text-sm text-gray-600">{company.company_name}</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => window.location.href = '/'}>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/")}
+            >
               View Public Site
             </Button>
             <Button variant="outline" onClick={signOut}>
@@ -277,7 +302,8 @@ const CompanyDashboard = () => {
             <CardContent>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-yellow-800">
-                  Your company is pending approval. Once approved, your classes will be visible to users.
+                  Your company is pending approval. Once approved, your classes
+                  will be visible to users.
                 </p>
               </div>
             </CardContent>
@@ -301,7 +327,9 @@ const CompanyDashboard = () => {
             {/* Classes Management */}
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Your Classes</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Your Classes
+                </h2>
                 <p className="text-gray-600">Manage your fitness classes</p>
               </div>
               <Button onClick={() => setShowAddClass(true)}>
@@ -314,10 +342,15 @@ const CompanyDashboard = () => {
             {showAddClass && (
               <Card className="mb-8">
                 <CardHeader>
-                  <CardTitle>{editingClass ? 'Edit Class' : 'Add New Class'}</CardTitle>
+                  <CardTitle>
+                    {editingClass ? "Edit Class" : "Add New Class"}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmitClass} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <form
+                    onSubmit={handleSubmitClass}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                  >
                     <div>
                       <Label htmlFor="title">Class Title</Label>
                       <Input
@@ -356,7 +389,9 @@ const CompanyDashboard = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Beginner">Beginner</SelectItem>
-                          <SelectItem value="Intermediate">Intermediate</SelectItem>
+                          <SelectItem value="Intermediate">
+                            Intermediate
+                          </SelectItem>
                           <SelectItem value="Advanced">Advanced</SelectItem>
                         </SelectContent>
                       </Select>
@@ -407,9 +442,13 @@ const CompanyDashboard = () => {
                     </div>
                     <div className="md:col-span-2 flex gap-2">
                       <Button type="submit">
-                        {editingClass ? 'Update Class' : 'Create Class'}
+                        {editingClass ? "Update Class" : "Create Class"}
                       </Button>
-                      <Button type="button" variant="outline" onClick={resetForm}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={resetForm}
+                      >
                         Cancel
                       </Button>
                     </div>
@@ -423,8 +462,12 @@ const CompanyDashboard = () => {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No classes yet</h3>
-                  <p className="text-gray-600 mb-4">Start by creating your first fitness class.</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No classes yet
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Start by creating your first fitness class.
+                  </p>
                   <Button onClick={() => setShowAddClass(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Add Your First Class
@@ -434,18 +477,27 @@ const CompanyDashboard = () => {
             ) : (
               <div className="grid gap-6">
                 {classes.map((classItem) => (
-                  <Card key={classItem.id} className="hover:shadow-lg transition-shadow">
+                  <Card
+                    key={classItem.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="text-xl">{classItem.title}</CardTitle>
+                          <CardTitle className="text-xl">
+                            {classItem.title}
+                          </CardTitle>
                           <CardDescription>
                             with {classItem.instructor}
                           </CardDescription>
                         </div>
                         <div className="flex gap-2">
-                          <Badge variant="outline">{classItem.class_type}</Badge>
-                          <Badge variant="secondary">{classItem.difficulty}</Badge>
+                          <Badge variant="outline">
+                            {classItem.class_type}
+                          </Badge>
+                          <Badge variant="secondary">
+                            {classItem.difficulty}
+                          </Badge>
                           <Button
                             size="sm"
                             variant="outline"
@@ -467,23 +519,39 @@ const CompanyDashboard = () => {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
-                          <span>{new Date(classItem.class_date).toLocaleDateString()}</span>
+                          <span>
+                            {new Date(
+                              classItem.class_date
+                            ).toLocaleDateString()}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4" />
-                          <span>{classItem.class_time} ({classItem.duration_minutes} min)</span>
+                          <span>
+                            {classItem.class_time} ({classItem.duration_minutes}{" "}
+                            min)
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
-                          <span>{classItem.current_bookings}/{classItem.max_capacity} booked</span>
+                          <span>
+                            {classItem.current_bookings}/
+                            {classItem.max_capacity} booked
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            classItem.current_bookings >= classItem.max_capacity 
-                              ? 'bg-red-100 text-red-800' 
-                              : 'bg-green-100 text-green-800'
-                          }`}>
-                            {classItem.current_bookings >= classItem.max_capacity ? 'Full' : 'Available'}
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              classItem.current_bookings >=
+                              classItem.max_capacity
+                                ? "bg-red-100 text-red-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {classItem.current_bookings >=
+                            classItem.max_capacity
+                              ? "Full"
+                              : "Available"}
                           </span>
                         </div>
                       </div>

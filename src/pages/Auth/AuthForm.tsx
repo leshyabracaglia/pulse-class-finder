@@ -1,32 +1,37 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuthContext } from "@/providers/AuthProvider";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthFormProps {
-  mode: 'signin' | 'signup';
+  mode: "signin" | "signup";
   onToggleMode: () => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [companyDescription, setCompanyDescription] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [website, setWebsite] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyDescription, setCompanyDescription] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [website, setWebsite] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userType, setUserType] = useState<'user' | 'company'>('user');
-  const { signUp, signIn } = useAuth();
+  const [userType, setUserType] = useState<"user" | "company">("user");
+  const { signUp, signIn } = useAuthContext();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,18 +40,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
 
     try {
       let result;
-      if (mode === 'signup') {
+      if (mode === "signup") {
         result = await signUp(email, password, fullName);
-        
+
         // If this is a company signup and account creation was successful
-        if (!result.error && userType === 'company') {
+        if (!result.error && userType === "company") {
           // Wait a moment for the user to be created, then create company profile
           setTimeout(async () => {
             try {
-              const { data: { user } } = await supabase.auth.getUser();
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
               if (user) {
                 const { error: companyError } = await supabase
-                  .from('companies')
+                  .from("companies")
                   .insert({
                     user_id: user.id,
                     company_name: companyName,
@@ -58,16 +65,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
                   });
 
                 if (companyError) {
-                  console.error('Error creating company profile:', companyError);
+                  console.error(
+                    "Error creating company profile:",
+                    companyError
+                  );
                   toast({
                     title: "Warning",
-                    description: "Account created but company profile failed. Please contact support.",
+                    description:
+                      "Account created but company profile failed. Please contact support.",
                     variant: "destructive",
                   });
                 }
               }
             } catch (error) {
-              console.error('Error in company profile creation:', error);
+              console.error("Error in company profile creation:", error);
             }
           }, 2000);
         }
@@ -82,15 +93,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
           variant: "destructive",
         });
       } else {
-        if (mode === 'signup') {
+        if (mode === "signup") {
           toast({
             title: "Success",
-            description: userType === 'company' 
-              ? "Company account created! Please check your email to verify your account. Your company will need approval before you can list classes."
-              : "Account created! Please check your email to verify your account.",
+            description:
+              userType === "company"
+                ? "Company account created! Please check your email to verify your account. Your company will need approval before you can list classes."
+                : "Account created! Please check your email to verify your account.",
           });
         } else {
-          window.location.href = '/';
+          window.location.href = "/";
         }
       }
     } catch (error) {
@@ -107,32 +119,39 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
   return (
     <Card className="w-full max-w-lg">
       <CardHeader>
-        <CardTitle>{mode === 'signin' ? 'Sign In' : 'Sign Up'}</CardTitle>
+        <CardTitle>{mode === "signin" ? "Sign In" : "Sign Up"}</CardTitle>
         <CardDescription>
-          {mode === 'signin' 
-            ? 'Sign in to your account' 
-            : 'Create an account to get started'
-          }
+          {mode === "signin"
+            ? "Sign in to your account"
+            : "Create an account to get started"}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {mode === 'signup' && (
-          <Tabs value={userType} onValueChange={(value) => setUserType(value as 'user' | 'company')} className="mb-6">
+        {mode === "signup" && (
+          <Tabs
+            value={userType}
+            onValueChange={(value) => setUserType(value as "user" | "company")}
+            className="mb-6"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="user">Personal Account</TabsTrigger>
               <TabsTrigger value="company">Company Account</TabsTrigger>
             </TabsList>
             <TabsContent value="user" className="mt-4">
-              <p className="text-sm text-gray-600">Sign up as an individual to book fitness classes</p>
+              <p className="text-sm text-gray-600">
+                Sign up as an individual to book fitness classes
+              </p>
             </TabsContent>
             <TabsContent value="company" className="mt-4">
-              <p className="text-sm text-gray-600">Sign up as a wellness company to list and manage classes</p>
+              <p className="text-sm text-gray-600">
+                Sign up as a wellness company to list and manage classes
+              </p>
             </TabsContent>
           </Tabs>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'signup' && (
+          {mode === "signup" && (
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
               <Input
@@ -146,7 +165,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
             </div>
           )}
 
-          {mode === 'signup' && userType === 'company' && (
+          {mode === "signup" && userType === "company" && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="companyName">Company Name</Label>
@@ -235,15 +254,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Loading...' : (mode === 'signin' ? 'Sign In' : 'Sign Up')}
+            {loading ? "Loading..." : mode === "signin" ? "Sign In" : "Sign Up"}
           </Button>
         </form>
         <div className="mt-4 text-center">
           <Button variant="link" onClick={onToggleMode}>
-            {mode === 'signin' 
-              ? "Don't have an account? Sign up" 
-              : "Already have an account? Sign in"
-            }
+            {mode === "signin"
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Sign in"}
           </Button>
         </div>
       </CardContent>
