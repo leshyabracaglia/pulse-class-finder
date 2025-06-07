@@ -19,6 +19,8 @@ interface AuthFormProps {
   onToggleMode: () => void;
 }
 
+type IUserType = "user" | "company";
+
 const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +32,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
   const [address, setAddress] = useState("");
   const [website, setWebsite] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userType, setUserType] = useState<"user" | "company">("user");
+  const [userType, setUserType] = useState<IUserType>("user");
   const { signUp, signIn } = useAuthContext();
   const { toast } = useToast();
 
@@ -130,7 +132,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
         {mode === "signup" && (
           <Tabs
             value={userType}
-            onValueChange={(value) => setUserType(value as "user" | "company")}
+            onValueChange={(value) => setUserType(value as IUserType)}
             className="mb-6"
           >
             <TabsList className="grid w-full grid-cols-2">
