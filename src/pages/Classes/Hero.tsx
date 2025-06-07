@@ -14,7 +14,7 @@ function ListYourClassesCTA() {
       <Button
         variant="secondary"
         className="bg-white text-blue-600 hover:bg-blue-50"
-        onClick={() => (window.location.href = "/auth")}
+        onClick={() => (window.location.href = "/company-dashboard")}
       >
         List Your Classes
       </Button>
