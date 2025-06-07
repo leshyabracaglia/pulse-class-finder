@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Clock, Users, Calendar } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 
 interface UserPackage {
   id: string;

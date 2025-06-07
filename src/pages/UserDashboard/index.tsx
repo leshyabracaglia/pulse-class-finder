@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, User } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
+import { formatDate, formatTime } from "@/lib/utils";
 
 interface Booking {
   id: string;
@@ -31,14 +32,16 @@ interface Booking {
 
 const UserDashboard = () => {
   const { user, signOut } = useAuthContext();
+  const { toast } = useToast();
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
       fetchBookings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const fetchBookings = async () => {
@@ -119,22 +122,6 @@ const UserDashboard = () => {
         variant: "destructive",
       });
     }
-  };
-
-  const formatTime = (time: string) => {
-    return new Date(`2000-01-01T${time}`).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString([], {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   if (loading) {

@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Package, Plus, Edit, Trash2, Clock, Users } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 
 interface PackageData {
   id: string;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -32,8 +32,8 @@ import {
   Building,
   Package,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import PackageManager from "./PackageManager";
+import { useToast } from "@/hooks/useToast";
+import PackageManager from "@/pages/CompanyDashboard/PackageManager";
 
 interface Company {
   id: string;
@@ -59,32 +59,33 @@ interface ClassData {
   current_bookings: number;
 }
 
-const CompanyDashboard = () => {
+const DEFAULT_CLASS_DATA: ClassData = {
+  id: "",
+  title: "",
+  instructor: "",
+  class_time: "",
+  class_date: "",
+  duration_minutes: 60,
+  difficulty: "Beginner",
+  class_type: "",
+  max_capacity: 20,
+  current_bookings: 0,
+};
+
+export default function CompanyDashboard() {
   const { user, signOut } = useAuthContext();
+  const { toast } = useToast();
+
   const [company, setCompany] = useState<Company | null>(null);
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddClass, setShowAddClass] = useState(false);
   const [editingClass, setEditingClass] = useState<ClassData | null>(null);
-  const { toast } = useToast();
 
   // Form states for adding/editing classes
-  const [title, setTitle] = useState("");
-  const [instructor, setInstructor] = useState("");
-  const [classTime, setClassTime] = useState("");
-  const [classDate, setClassDate] = useState("");
-  const [duration, setDuration] = useState(60);
-  const [difficulty, setDifficulty] = useState("Beginner");
-  const [classType, setClassType] = useState("");
-  const [maxCapacity, setMaxCapacity] = useState(20);
+  const [classData, setClassData] = useState<ClassData>(DEFAULT_CLASS_DATA);
 
-  useEffect(() => {
-    if (user) {
-      fetchCompanyData();
-    }
-  }, [user]);
-
-  const fetchCompanyData = async () => {
+  const fetchCompanyData = useCallback(async () => {
     try {
       // Fetch company data
       const { data: companyData, error: companyError } = await supabase
@@ -123,17 +124,16 @@ const CompanyDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, user?.id]);
+
+  useEffect(() => {
+    if (user) {
+      fetchCompanyData();
+    }
+  }, [fetchCompanyData, user]);
 
   const resetForm = () => {
-    setTitle("");
-    setInstructor("");
-    setClassTime("");
-    setClassDate("");
-    setDuration(60);
-    setDifficulty("Beginner");
-    setClassType("");
-    setMaxCapacity(20);
+    setClassData(DEFAULT_CLASS_DATA);
     setEditingClass(null);
     setShowAddClass(false);
   };
@@ -143,34 +143,25 @@ const CompanyDashboard = () => {
     if (!company) return;
 
     try {
-      const classData = {
-        title,
-        instructor,
-        class_time: classTime,
-        class_date: classDate,
-        duration_minutes: duration,
-        difficulty,
-        class_type: classType,
-        max_capacity: maxCapacity,
+      const classDataToSave = {
+        ...classData,
         company_id: company.id,
         current_bookings: editingClass?.current_bookings || 0,
       };
 
-      if (editingClass) {
-        const { error } = await supabase
-          .from("classes")
-          .update(classData)
-          .eq("id", editingClass.id);
+      const { error } = await supabase
+        .from("classes")
+        .upsert(classDataToSave)
+        .eq("id", editingClass.id);
 
-        if (error) throw error;
+      if (error) throw error;
+
+      if (editingClass) {
         toast({
           title: "Success",
           description: "Class updated successfully.",
         });
       } else {
-        const { error } = await supabase.from("classes").insert(classData);
-
-        if (error) throw error;
         toast({
           title: "Success",
           description: "Class created successfully.",
@@ -190,14 +181,7 @@ const CompanyDashboard = () => {
   };
 
   const handleEditClass = (classItem: ClassData) => {
-    setTitle(classItem.title);
-    setInstructor(classItem.instructor);
-    setClassTime(classItem.class_time);
-    setClassDate(classItem.class_date);
-    setDuration(classItem.duration_minutes);
-    setDifficulty(classItem.difficulty);
-    setClassType(classItem.class_type);
-    setMaxCapacity(classItem.max_capacity);
+    setClassData(classItem);
     setEditingClass(classItem);
     setShowAddClass(true);
   };
@@ -355,8 +339,10 @@ const CompanyDashboard = () => {
                       <Label htmlFor="title">Class Title</Label>
                       <Input
                         id="title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        value={classData.title}
+                        onChange={(e) =>
+                          setClassData({ ...classData, title: e.target.value })
+                        }
                         placeholder="e.g., Morning Yoga"
                         required
                       />
@@ -365,8 +351,13 @@ const CompanyDashboard = () => {
                       <Label htmlFor="instructor">Instructor</Label>
                       <Input
                         id="instructor"
-                        value={instructor}
-                        onChange={(e) => setInstructor(e.target.value)}
+                        value={classData.instructor}
+                        onChange={(e) =>
+                          setClassData({
+                            ...classData,
+                            instructor: e.target.value,
+                          })
+                        }
                         placeholder="Instructor name"
                         required
                       />
@@ -375,15 +366,25 @@ const CompanyDashboard = () => {
                       <Label htmlFor="classType">Class Type</Label>
                       <Input
                         id="classType"
-                        value={classType}
-                        onChange={(e) => setClassType(e.target.value)}
+                        value={classData.class_type}
+                        onChange={(e) =>
+                          setClassData({
+                            ...classData,
+                            class_type: e.target.value,
+                          })
+                        }
                         placeholder="e.g., Yoga, HIIT, Pilates"
                         required
                       />
                     </div>
                     <div>
                       <Label htmlFor="difficulty">Difficulty</Label>
-                      <Select value={difficulty} onValueChange={setDifficulty}>
+                      <Select
+                        value={classData.difficulty}
+                        onValueChange={(value) =>
+                          setClassData({ ...classData, difficulty: value })
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -401,8 +402,13 @@ const CompanyDashboard = () => {
                       <Input
                         id="classDate"
                         type="date"
-                        value={classDate}
-                        onChange={(e) => setClassDate(e.target.value)}
+                        value={classData.class_date}
+                        onChange={(e) =>
+                          setClassData({
+                            ...classData,
+                            class_date: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -411,8 +417,13 @@ const CompanyDashboard = () => {
                       <Input
                         id="classTime"
                         type="time"
-                        value={classTime}
-                        onChange={(e) => setClassTime(e.target.value)}
+                        value={classData.class_time}
+                        onChange={(e) =>
+                          setClassData({
+                            ...classData,
+                            class_time: e.target.value,
+                          })
+                        }
                         required
                       />
                     </div>
@@ -421,8 +432,13 @@ const CompanyDashboard = () => {
                       <Input
                         id="duration"
                         type="number"
-                        value={duration}
-                        onChange={(e) => setDuration(Number(e.target.value))}
+                        value={classData.duration_minutes}
+                        onChange={(e) =>
+                          setClassData({
+                            ...classData,
+                            duration_minutes: Number(e.target.value),
+                          })
+                        }
                         min="15"
                         max="180"
                         required
@@ -433,8 +449,13 @@ const CompanyDashboard = () => {
                       <Input
                         id="maxCapacity"
                         type="number"
-                        value={maxCapacity}
-                        onChange={(e) => setMaxCapacity(Number(e.target.value))}
+                        value={classData.max_capacity}
+                        onChange={(e) =>
+                          setClassData({
+                            ...classData,
+                            max_capacity: Number(e.target.value),
+                          })
+                        }
                         min="1"
                         max="100"
                         required
@@ -569,6 +590,4 @@ const CompanyDashboard = () => {
       </div>
     </div>
   );
-};
-
-export default CompanyDashboard;
+}

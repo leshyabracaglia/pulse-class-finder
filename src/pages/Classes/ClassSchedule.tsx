@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, MapPin } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
+import { formatDate, formatTime } from "@/lib/utils";
 
 interface ClassData {
   id: string;
@@ -32,12 +33,14 @@ interface ClassData {
 
 const ClassSchedule = () => {
   const { user } = useAuthContext();
+  const { toast } = useToast();
+
   const [classes, setClasses] = useState<ClassData[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     fetchClasses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchClasses = async () => {
@@ -148,22 +151,6 @@ const ClassSchedule = () => {
         variant: "destructive",
       });
     }
-  };
-
-  const formatTime = (time: string) => {
-    return new Date(`2000-01-01T${time}`).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString([], {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   if (loading) {
