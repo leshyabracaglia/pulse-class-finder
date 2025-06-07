@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,11 +43,12 @@ export default function AuthProvider({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", event, session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
 
-      // Check if user is a company when they sign in
+      // Only handle redirects for sign-in events, not general auth state changes
       if (event === "SIGNED_IN" && session?.user) {
         // Defer the company check to avoid potential deadlocks
         setTimeout(async () => {
@@ -57,18 +59,25 @@ export default function AuthProvider({
               .eq("user_id", session.user.id)
               .single();
 
-            // If company exists and we're not already on company dashboard, redirect
+            // Only redirect if company exists AND we're currently on auth page or root
+            const currentPath = window.location.pathname;
             if (
               companyData &&
-              !window.location.pathname.includes("company-dashboard")
+              (currentPath === "/auth" || currentPath === "/")
             ) {
+              console.log("Redirecting company user to company dashboard");
               window.location.href = "/company-dashboard";
+            } else if (!companyData && currentPath === "/auth") {
+              // Regular user, redirect to main page only if on auth page
+              console.log("Redirecting regular user to main page");
+              window.location.href = "/";
             }
           } catch (error) {
-            // If no company found or error, continue to regular dashboard
-            console.log(
-              "No company profile found, continuing to user dashboard"
-            );
+            // If no company found or error, only redirect if on auth page
+            console.log("No company profile found or error, staying on current page");
+            if (window.location.pathname === "/auth") {
+              window.location.href = "/";
+            }
           }
         }, 100);
       }
