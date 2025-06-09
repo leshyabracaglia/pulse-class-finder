@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ export default function useUserClasses() {
   const [classes, setClasses] = useState<ClassData[]>();
 
   const fetchClasses = async () => {
+    console.log("fetchClasses called, user:", user);
     try {
       const { data, error } = await supabase
         .from("classes")
@@ -43,6 +45,8 @@ export default function useUserClasses() {
         .order("class_date", { ascending: true })
         .order("class_time", { ascending: true });
 
+      console.log("Classes query result:", { data, error });
+      
       if (error) throw error;
       setClasses(data || []);
     } catch (error) {
