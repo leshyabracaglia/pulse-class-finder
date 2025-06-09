@@ -1,5 +1,5 @@
 
-import { Calendar, Home, Building, User, Package, LogOut } from "lucide-react";
+import { Calendar, Home, Building, User, Package, LogOut, Settings } from "lucide-react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import {
@@ -54,6 +54,11 @@ export function AppSidebar() {
       url: "/dashboard",
       icon: User,
     },
+    {
+      title: "Profile",
+      url: "/profile",
+      icon: Settings,
+    },
   ];
 
   const companyMenuItems = [
@@ -66,6 +71,11 @@ export function AppSidebar() {
       title: "Company Dashboard",
       url: "/company-dashboard", 
       icon: Building,
+    },
+    {
+      title: "Company Profile",
+      url: "/company-profile",
+      icon: Settings,
     },
   ];
 
