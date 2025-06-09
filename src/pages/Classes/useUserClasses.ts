@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +29,15 @@ export default function useUserClasses() {
   const fetchClasses = async () => {
     console.log("fetchClasses called, user:", user);
     try {
+      // First, let's check if there are any classes at all
+      const { data: allClasses, error: allError } = await supabase
+        .from("classes")
+        .select("id, title, class_date")
+        .limit(5);
+      
+      console.log("All classes check:", { allClasses, allError });
+
+      // Now get the classes with the original filter
       const { data, error } = await supabase
         .from("classes")
         .select(
@@ -46,6 +54,7 @@ export default function useUserClasses() {
         .order("class_time", { ascending: true });
 
       console.log("Classes query result:", { data, error });
+      console.log("Query date filter:", new Date().toISOString().split("T")[0]);
       
       if (error) throw error;
       setClasses(data || []);
