@@ -1,7 +1,7 @@
 
 import { Calendar, Home, Building, User, Package, LogOut, Settings } from "lucide-react";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function AppSidebar() {
   const { user, signOut } = useAuthContext();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isCompany, setIsCompany] = useState(false);
 
   useEffect(() => {
@@ -95,13 +96,19 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => handleNavigation("/")}>
+                  <SidebarMenuButton 
+                    onClick={() => handleNavigation("/")}
+                    isActive={location.pathname === "/"}
+                  >
                     <Calendar />
                     <span>Classes</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={() => handleNavigation("/auth")}>
+                  <SidebarMenuButton 
+                    onClick={() => handleNavigation("/auth")}
+                    isActive={location.pathname === "/auth"}
+                  >
                     <User />
                     <span>Sign In</span>
                   </SidebarMenuButton>
@@ -131,7 +138,10 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton onClick={() => handleNavigation(item.url)}>
+                  <SidebarMenuButton 
+                    onClick={() => handleNavigation(item.url)}
+                    isActive={location.pathname === item.url}
+                  >
                     <item.icon />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
