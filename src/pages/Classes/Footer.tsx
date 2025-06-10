@@ -14,27 +14,28 @@ const Footer = () => {
 
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
-              System
+              Pages
             </h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a
+                  href="/dashboard"
+                  className="hover:text-gray-900 transition-colors"
+                >
                   Dashboard
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
+                <a href="/" className="hover:text-gray-900 transition-colors">
                   Classes
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Members
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Reports
+                <a
+                  href="/profile"
+                  className="hover:text-gray-900 transition-colors"
+                >
+                  Profile
                 </a>
               </li>
             </ul>
@@ -47,22 +48,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-gray-600">
               <li>
                 <a href="#" className="hover:text-gray-900 transition-colors">
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  API Reference
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
                   Contact Support
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  System Status
                 </a>
               </li>
             </ul>

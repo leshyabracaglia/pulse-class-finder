@@ -2,46 +2,26 @@ import { useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/useToast";
+import { IClassData } from "@/lib/IClassData";
 
-export interface ClassData {
-  id: string;
-  title: string;
-  instructor: string;
-  class_time: string;
-  class_date: string;
-  duration_minutes: number;
-  difficulty: string;
-  class_type: string;
-  max_capacity: number;
-  current_bookings: number;
+export interface IAvailableClassData extends IClassData {
   companies?: {
     company_name: string;
     address: string;
   };
 }
 
-export default function useUserClasses() {
+export default function useAvailableClasses() {
   const { user } = useAuthContext();
   const { toast } = useToast();
 
-  const [classes, setClasses] = useState<ClassData[]>();
+  const [classes, setClasses] = useState<IAvailableClassData[]>();
 
   const fetchClasses = async () => {
-    console.log("fetchClasses called, user:", user);
     try {
-      // First, let's check if there are any classes at all
-      const { data: allClasses, error: allError } = await supabase
-        .from("classes")
-        .select("id, title, class_date")
-        .limit(5);
-      
-      console.log("All classes check:", { allClasses, allError });
-
-      // Now get the classes with the original filter
       const { data, error } = await supabase
         .from("classes")
-        .select(
-          `
+        .select<string, IAvailableClassData>(`
           *,
           companies (
             company_name,
@@ -49,12 +29,9 @@ export default function useUserClasses() {
           )
         `
         )
-        .gte("class_date", new Date().toISOString().split("T")[0])
+        // .gte("class_date", new Date().toISOString().split("T")[0])
         .order("class_date", { ascending: true })
         .order("class_time", { ascending: true });
-
-      console.log("Classes query result:", { data, error });
-      console.log("Query date filter:", new Date().toISOString().split("T")[0]);
       
       if (error) throw error;
       setClasses(data || []);
