@@ -90,6 +90,23 @@ export default function AuthProvider({
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (isCompany || !user) return;
+    const checkUserType = async () => {
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      setIsCompany(!!data);
+    };
+
+    checkUserType();
+  }, [isCompany, user]);
+
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
 

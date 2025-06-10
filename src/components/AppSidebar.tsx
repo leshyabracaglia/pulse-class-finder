@@ -1,5 +1,4 @@
-
-import { Calendar, Home, Building, User, Package, LogOut, Settings } from "lucide-react";
+import { Calendar, Building, User, LogOut, Settings } from "lucide-react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -14,73 +13,53 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+
+const USER_MENU_ITEMS = [
+  {
+    title: "Classes",
+    url: "/",
+    icon: Calendar,
+  },
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: User,
+  },
+  {
+    title: "Profile",
+    url: "/profile",
+    icon: Settings,
+  },
+];
+
+const COMPANY_MENU_ITEMS = [
+  {
+    title: "Classes",
+    url: "/",
+    icon: Calendar,
+  },
+  {
+    title: "Company Dashboard",
+    url: "/company-dashboard",
+    icon: Building,
+  },
+  {
+    title: "Company Profile",
+    url: "/company-profile",
+    icon: Settings,
+  },
+];
 
 export function AppSidebar() {
-  const { user, signOut } = useAuthContext();
+  const { user, signOut, isCompany } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isCompany, setIsCompany] = useState(false);
-
-  useEffect(() => {
-    const checkUserType = async () => {
-      if (!user) return;
-      
-      const { data } = await supabase
-        .from("companies")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-      
-      setIsCompany(!!data);
-    };
-
-    checkUserType();
-  }, [user]);
 
   const handleNavigation = (path: string) => {
     navigate(path);
   };
 
-  const userMenuItems = [
-    {
-      title: "Classes",
-      url: "/",
-      icon: Calendar,
-    },
-    {
-      title: "Dashboard", 
-      url: "/dashboard",
-      icon: User,
-    },
-    {
-      title: "Profile",
-      url: "/profile",
-      icon: Settings,
-    },
-  ];
-
-  const companyMenuItems = [
-    {
-      title: "Classes",
-      url: "/",
-      icon: Calendar,
-    },
-    {
-      title: "Company Dashboard",
-      url: "/company-dashboard", 
-      icon: Building,
-    },
-    {
-      title: "Company Profile",
-      url: "/company-profile",
-      icon: Settings,
-    },
-  ];
-
-  const menuItems = isCompany ? companyMenuItems : userMenuItems;
+  const menuItems = isCompany ? COMPANY_MENU_ITEMS : USER_MENU_ITEMS;
 
   if (!user) {
     return (
@@ -96,7 +75,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     onClick={() => handleNavigation("/")}
                     isActive={location.pathname === "/"}
                   >
@@ -105,7 +84,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     onClick={() => handleNavigation("/auth")}
                     isActive={location.pathname === "/auth"}
                   >
@@ -138,7 +117,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                     onClick={() => handleNavigation(item.url)}
                     isActive={location.pathname === item.url}
                   >
