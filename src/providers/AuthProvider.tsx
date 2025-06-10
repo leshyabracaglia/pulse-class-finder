@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +16,7 @@ interface IAuthContext {
   ) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   loading: boolean;
+  isCompany: boolean;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -37,13 +37,13 @@ export default function AuthProvider({
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCompany, setIsCompany] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state change:", event, session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -51,7 +51,7 @@ export default function AuthProvider({
       // Only handle redirects for actual sign-in events from the auth page
       if (event === "SIGNED_IN" && session?.user) {
         const currentPath = window.location.pathname;
-        
+
         // Only redirect if we're coming from the auth page
         if (currentPath === "/auth") {
           // Defer the company check to avoid potential deadlocks
@@ -65,6 +65,7 @@ export default function AuthProvider({
 
               if (companyData) {
                 console.log("Redirecting company user to company dashboard");
+                setIsCompany(true);
                 window.location.href = "/company-dashboard";
               } else {
                 console.log("Redirecting regular user to main page");
@@ -124,6 +125,7 @@ export default function AuthProvider({
     signIn,
     signOut,
     loading,
+    isCompany,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
