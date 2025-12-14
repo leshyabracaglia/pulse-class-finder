@@ -43,16 +43,17 @@ export type Database = {
       }
       classes: {
         Row: {
+          organization_uid: string
           class_date: string
           class_time: string
-          class_type: string
-          company_id: string | null
+          // class_type: string
+          // company_id: string | null
           created_at: string | null
-          current_bookings: number
-          difficulty: string | null
-          duration_minutes: number
+          // current_bookings: number
+          // difficulty: string | null
+          // duration_minutes: number
           id: string
-          instructor: string
+          // instructor: string
           max_capacity: number
           title: string
         }
@@ -94,47 +95,77 @@ export type Database = {
           },
         ]
       }
-      companies: {
+      organizations: {
         Row: {
-          address: string | null
-          company_name: string
-          contact_email: string
+          organization_uid: string
+          // user_uid: string
+          // address: string | null
+          name: string
+          // contact_email: string
           created_at: string | null
-          description: string | null
-          id: string
-          is_approved: boolean | null
-          phone: string | null
-          updated_at: string | null
-          user_id: string
-          website: string | null
+          // description: string | null
+          // id: string
+          // is_approved: boolean | null
+          // phone: string | null
+          // updated_at: string | null
+          // user_id: string
+          // website: string | null
         }
         Insert: {
-          address?: string | null
-          company_name: string
-          contact_email: string
+          organization_uid: string
+          name: string
+          // address?: string | null
+          // company_name: string
+          // contact_email: string
           created_at?: string | null
-          description?: string | null
-          id?: string
-          is_approved?: boolean | null
-          phone?: string | null
-          updated_at?: string | null
-          user_id: string
-          website?: string | null
+          // description?: string | null
+          // id?: string
+          // is_approved?: boolean | null
+          // phone?: string | null
+          // updated_at?: string | null
+          // user_id: string
+          // website?: string | null
         }
         Update: {
-          address?: string | null
-          company_name?: string
-          contact_email?: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_approved?: boolean | null
-          phone?: string | null
-          updated_at?: string | null
-          user_id?: string
-          website?: string | null
+          name?: string
+          // address?: string | null
+          // company_name?: string
+          // contact_email?: string
+          // created_at?: string | null
+          // description?: string | null
+          // id?: string
+          // is_approved?: boolean | null
+          // phone?: string | null
+          // updated_at?: string | null
+          // user_id?: string
+          // website?: string | null
         }
         Relationships: []
+      }
+      organization_admins: {
+        Row: {
+          organization_uid: string
+          user_uid: string
+          added_at: string | null
+        }
+        Insert: {
+          organization_uid: string
+          user_uid: string
+          added_at?: string | null
+        }
+        Update: {
+          organization_uid?: string
+          user_uid?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_admins_organization_uid_fkey"
+            columns: ["organization_uid"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_uid"]
+          },
+        ]
       }
       packages: {
         Row: {

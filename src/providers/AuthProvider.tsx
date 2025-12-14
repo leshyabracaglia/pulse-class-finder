@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { ROUTES } from "@/App";
+import { useLocation } from "react-router-dom";
 
 interface IAuthContext {
   user: User | null;
@@ -16,10 +18,20 @@ interface IAuthContext {
   ) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   loading: boolean;
-  isCompany: boolean;
+  isCompanyAdmin: boolean;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
+
+async function checkOrganizationAdmin(user: User) {
+  const { data } = await supabase
+    .from("organization_admins")
+    .select("organization_uid")
+    .eq("user_uid", user.id)
+    .single();
+
+  return !!data;
+}
 
 export function useAuthContext() {
   const context = useContext(AuthContext);
@@ -34,10 +46,10 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isCompany, setIsCompany] = useState(false);
+  const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -45,35 +57,35 @@ export default function AuthProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
-      setUser(session?.user ?? null);
       setLoading(false);
 
-      // Only handle redirects for actual sign-in events from the auth page
       if (event === "SIGNED_IN" && session?.user) {
         const currentPath = window.location.pathname;
 
         // Only redirect if we're coming from the auth page
-        if (currentPath === "/auth") {
+        if (currentPath === ROUTES.AUTH) {
           // Defer the company check to avoid potential deadlocks
           setTimeout(async () => {
             try {
               const { data: companyData } = await supabase
-                .from("companies")
-                .select("id")
-                .eq("user_id", session.user.id)
+                .from("organization_admins")
+                .select("organization_uid")
+                .eq("user_uid", session.user.id)
                 .single();
 
               if (companyData) {
-                console.log("Redirecting company user to company dashboard");
-                setIsCompany(true);
-                window.location.href = "/company-dashboard";
+                console.log(
+                  "Redirecting organization admin to organization dashboard"
+                );
+                setIsCompanyAdmin(true);
+                window.location.href = ROUTES.COMPANY_DASHBOARD;
               } else {
                 console.log("Redirecting regular user to main page");
-                window.location.href = "/";
+                window.location.href = ROUTES.HOME;
               }
             } catch (error) {
               console.log("No company profile found, redirecting to main page");
-              window.location.href = "/";
+              window.location.href = ROUTES.HOME;
             }
           }, 100);
         }
@@ -82,8 +94,8 @@ export default function AuthProvider({
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("\n\nhere: ", session);
       setSession(session);
-      setUser(session?.user ?? null);
       setLoading(false);
     });
 
@@ -91,21 +103,29 @@ export default function AuthProvider({
   }, []);
 
   useEffect(() => {
-    if (isCompany || !user) return;
+    if (isCompanyAdmin || !session?.user) return;
+
     const checkUserType = async () => {
-      if (!user) return;
+      if (!session?.user) return;
 
-      const { data } = await supabase
-        .from("companies")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      setIsCompany(!!data);
+      const isOrganizationAdmin = await checkOrganizationAdmin(session?.user);
+      setIsCompanyAdmin(isOrganizationAdmin);
     };
 
     checkUserType();
-  }, [isCompany, user]);
+  }, [isCompanyAdmin, session?.user]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
@@ -132,7 +152,26 @@ export default function AuthProvider({
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+
+      if (
+        error &&
+        !error.message
+          .toLowerCase()
+          .includes("session from session_id claim in jwt does not exist")
+      ) {
+        console.error("Supabase signOut error:", error);
+      }
+    } catch (e) {
+      // Network or unexpected errors shouldn't block clearing local auth state.
+      console.error("Unexpected signOut error:", e);
+    } finally {
+      setSession(null);
+      setIsCompanyAdmin(false);
+
+      window.location.href = ROUTES.AUTH;
+    }
   };
 
   const value = {
@@ -142,7 +181,7 @@ export default function AuthProvider({
     signIn,
     signOut,
     loading,
-    isCompany,
+    isCompanyAdmin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

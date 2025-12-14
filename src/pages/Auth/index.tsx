@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import AuthForm from "@/pages/Auth/AuthForm";
+import { ROUTES } from "@/App";
+import { AUTH_MODES, IAuthMode } from "./types";
 
 export default function Auth() {
   const { user } = useAuthContext();
 
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<IAuthMode>(AUTH_MODES.SIGNIN);
 
   useEffect(() => {
     if (user) {
-      window.location.href = "/";
+      window.location.href = ROUTES.HOME;
     }
   }, [user]);
 
   const toggleMode = () => {
-    setMode(mode === "signin" ? "signup" : "signin");
+    setMode(mode === AUTH_MODES.SIGNIN ? AUTH_MODES.SIGNUP : AUTH_MODES.SIGNIN);
   };
 
   return (

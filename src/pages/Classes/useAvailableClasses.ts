@@ -5,9 +5,9 @@ import { useToast } from "@/hooks/useToast";
 import { IClassData } from "@/lib/IClassData";
 
 export interface IAvailableClassData extends IClassData {
-  companies?: {
-    company_name: string;
-    address: string;
+  organizations?: {
+    name: string;
+    // address: string;
   };
 }
 
@@ -23,9 +23,8 @@ export default function useAvailableClasses() {
         .from("classes")
         .select<string, IAvailableClassData>(`
           *,
-          companies (
-            company_name,
-            address
+          organizations (
+            name
           )
         `
         )
@@ -60,7 +59,8 @@ export default function useAvailableClasses() {
       const classToBook = classes.find((c) => c.id === classId);
       if (
         classToBook &&
-        classToBook.current_bookings >= classToBook.max_capacity
+        // classToBook.current_bookings >= classToBook.max_capacity
+        classToBook.max_capacity <= 0
       ) {
         toast({
           title: "Class Full",
@@ -98,15 +98,15 @@ export default function useAvailableClasses() {
       if (bookingError) throw bookingError;
 
       // Update current_bookings count
-      const { error: updateError } = await supabase
-        .from("classes")
-        .update({
-          current_bookings: (classToBook?.current_bookings || 0) + 1,
-        })
-        .eq("id", classId);
+      // const { error: updateError } = await supabase
+      //   .from("classes")
+      //   .update({
+      //     // current_bookings: (classToBook?.current_bookings || 0) + 1,
+      //   })
+      //   .eq("id", classId);
 
-      if (updateError)
-        console.error("Error updating class capacity:", updateError);
+      // if (updateError)
+        // console.error("Error updating class capacity:", updateError);
 
       toast({
         title: "Success",

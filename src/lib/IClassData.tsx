@@ -10,25 +10,25 @@ export type IClassDifficulty =
 export interface IClassData {
   id: string;
   title: string;
-  instructor: string;
+  // instructor: string;
   class_time: string;
   class_date: string;
-  duration_minutes: number;
-  difficulty: IClassDifficulty;
-  class_type: string;
+  // duration_minutes: number;
+  // difficulty: IClassDifficulty;
+  // class_type: string;
   max_capacity: number;
-  current_bookings: number;
+  // current_bookings: number;
 }
 
 export const DEFAULT_CLASS_DATA: IClassData = {
   id: "",
   title: "",
-  instructor: "",
+  // instructor: "",
   class_time: "",
   class_date: "",
-  duration_minutes: 60,
-  difficulty: CLASS_DIFFICULTIES.BEGINNER,
-  class_type: "",
+  // duration_minutes: 60,
+  // difficulty: CLASS_DIFFICULTIES.BEGINNER,
+  // class_type: "",
   max_capacity: 20,
-  current_bookings: 0,
+  // current_bookings: 0,
 };

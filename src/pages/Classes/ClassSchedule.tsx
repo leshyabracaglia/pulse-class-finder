@@ -41,7 +41,7 @@ function ClassCard({
   classItem: IAvailableClassData;
   userLocation: LocationState;
 }) {
-  const { user, isCompany } = useAuthContext();
+  const { user, isCompanyAdmin } = useAuthContext();
   const { bookClass } = useAvailableClasses();
 
   // Mock coordinates for demonstration - in a real app, you'd geocode the address
@@ -179,6 +179,8 @@ export default function ClassSchedule() {
     );
   }
 
+  const hasUpcomingClasses = !!classes?.length;
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -187,21 +189,23 @@ export default function ClassSchedule() {
             Upcoming Classes
           </h2>
 
-          <div className="flex justify-center">
-            <Button
-              onClick={requestLocation}
-              disabled={location.loading}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Locate className="w-4 h-4" />
-              {location.loading
-                ? "Getting location..."
-                : location.latitude
-                ? "Location enabled"
-                : "Show distances"}
-            </Button>
-          </div>
+          {hasUpcomingClasses && (
+            <div className="flex justify-center">
+              <Button
+                onClick={requestLocation}
+                disabled={location.loading}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Locate className="w-4 h-4" />
+                {location.loading
+                  ? "Getting location..."
+                  : location.latitude
+                  ? "Location enabled"
+                  : "Show distances"}
+              </Button>
+            </div>
+          )}
 
           {location.error && (
             <p className="text-sm text-red-600 mt-2">{location.error}</p>

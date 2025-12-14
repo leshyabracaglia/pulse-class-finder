@@ -13,15 +13,49 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useToast } from "@/hooks/useToast";
 import { supabase } from "@/integrations/supabase/client";
+import { AUTH_MODES, IAuthMode, IUserType, USER_TYPES } from "./types";
+import { ROUTES } from "@/App";
+
+async function createOrganization(companyName: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return false;
+  }
+
+  const organizationUid = crypto.randomUUID();
+  const { error: organizationError } = await supabase
+    .from("organizations")
+    .insert({
+      organization_uid: organizationUid,
+      name: companyName,
+    });
+
+  const { error: organizationAdminError } = await supabase
+    .from("organization_admins")
+    .insert({
+      user_uid: user.id,
+      organization_uid: organizationUid,
+    });
+
+  if (organizationError || organizationAdminError) {
+    return false;
+  }
+
+  return true;
+}
 
 interface AuthFormProps {
-  mode: "signin" | "signup";
+  mode: IAuthMode;
   onToggleMode: () => void;
 }
 
-type IUserType = "user" | "company";
+export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
+  const { signUp, signIn } = useAuthContext();
+  const { toast } = useToast();
 
-const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -32,9 +66,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
   const [address, setAddress] = useState("");
   const [website, setWebsite] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userType, setUserType] = useState<IUserType>("user");
-  const { signUp, signIn } = useAuthContext();
-  const { toast } = useToast();
+  const [userType, setUserType] = useState<IUserType>(USER_TYPES.USER);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,45 +74,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
 
     try {
       let result;
-      if (mode === "signup") {
+      if (mode === AUTH_MODES.SIGNUP) {
         result = await signUp(email, password, fullName);
 
-        // If this is a company signup and account creation was successful
-        if (!result.error && userType === "company") {
+        if (!result.error && userType === USER_TYPES.COMPANY) {
           // Wait a moment for the user to be created, then create company profile
           setTimeout(async () => {
             try {
-              const {
-                data: { user },
-              } = await supabase.auth.getUser();
-              if (user) {
-                const { error: companyError } = await supabase
-                  .from("companies")
-                  .insert({
-                    user_id: user.id,
-                    company_name: companyName,
-                    description: companyDescription,
-                    contact_email: contactEmail || email,
-                    phone: phone,
-                    address: address,
-                    website: website,
-                  });
+              const organizationCreated = await createOrganization(companyName);
 
-                if (companyError) {
-                  console.error(
-                    "Error creating company profile:",
-                    companyError
-                  );
-                  toast({
-                    title: "Warning",
-                    description:
-                      "Account created but company profile failed. Please contact support.",
-                    variant: "destructive",
-                  });
-                }
+              if (!organizationCreated) {
+                throw new Error("Failed to create organization");
               }
             } catch (error) {
-              console.error("Error in company profile creation:", error);
+              console.error("Error in organization creation:", error);
+              throw new Error("Failed to create organization");
             }
           }, 2000);
         }
@@ -95,16 +103,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
           variant: "destructive",
         });
       } else {
-        if (mode === "signup") {
+        if (mode === AUTH_MODES.SIGNUP) {
           toast({
             title: "Success",
             description:
-              userType === "company"
+              userType === USER_TYPES.COMPANY
                 ? "Company account created! Please check your email to verify your account. Your company will need approval before you can list classes."
                 : "Account created! Please check your email to verify your account.",
           });
         } else {
-          window.location.href = "/";
+          window.location.href = ROUTES.HOME;
         }
       }
     } catch (error) {
@@ -269,6 +277,4 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onToggleMode }) => {
       </CardContent>
     </Card>
   );
-};
-
-export default AuthForm;
+}
