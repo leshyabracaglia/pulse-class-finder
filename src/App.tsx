@@ -13,6 +13,7 @@ import UserProfile from "./pages/UserProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 import NotFound from "./pages/NotFound";
 import Layout from "./Layout";
+import OrganizationProvider from "./providers/OrganizationProvider";
 
 export const ROUTES = {
   AUTH: "/",
@@ -29,30 +30,32 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <SidebarProvider>
-            <Layout>
-              <Routes>
-                <Route path={ROUTES.AUTH} element={<Auth />} />
-                <Route path={ROUTES.HOME} element={<Classes />} />
-                <Route path={ROUTES.DASHBOARD} element={<UserDashboard />} />
-                <Route
-                  path={ROUTES.COMPANY_DASHBOARD}
-                  element={<CompanyDashboard />}
-                />
-                <Route path={ROUTES.PROFILE} element={<UserProfile />} />
-                <Route
-                  path={ROUTES.COMPANY_PROFILE}
-                  element={<CompanyProfile />}
-                />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Layout>
-          </SidebarProvider>
-        </BrowserRouter>
+        <OrganizationProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <SidebarProvider>
+              <Layout>
+                <Routes>
+                  <Route path={ROUTES.AUTH} element={<Auth />} />
+                  <Route path={ROUTES.HOME} element={<Classes />} />
+                  <Route path={ROUTES.DASHBOARD} element={<UserDashboard />} />
+                  <Route
+                    path={ROUTES.COMPANY_DASHBOARD}
+                    element={<CompanyDashboard />}
+                  />
+                  <Route path={ROUTES.PROFILE} element={<UserProfile />} />
+                  <Route
+                    path={ROUTES.COMPANY_PROFILE}
+                    element={<CompanyProfile />}
+                  />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            </SidebarProvider>
+          </BrowserRouter>
+        </OrganizationProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

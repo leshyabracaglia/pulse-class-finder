@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
-import AuthForm from "@/pages/Auth/AuthForm";
 import { ROUTES } from "@/App";
 import { AUTH_MODES, IAuthMode } from "./types";
+import SignUpForm from "./SignUpForm";
+import SignInForm from "./SignInForm";
 
 export default function Auth() {
   const { user } = useAuthContext();
@@ -11,6 +12,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
+      console.log("User is logged in, redirecting to home");
       window.location.href = ROUTES.HOME;
     }
   }, [user]);
@@ -21,7 +23,11 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <AuthForm mode={mode} onToggleMode={toggleMode} />
+      {mode === AUTH_MODES.SIGNIN ? (
+        <SignInForm onToggleMode={toggleMode} />
+      ) : (
+        <SignUpForm onToggleMode={toggleMode} />
+      )}
     </div>
   );
 }

@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { ROUTES } from "@/App";
-import { useLocation } from "react-router-dom";
 
 interface IAuthContext {
   user: User | null;
@@ -18,20 +17,9 @@ interface IAuthContext {
   ) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   loading: boolean;
-  isCompanyAdmin: boolean;
 }
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
-
-async function checkOrganizationAdmin(user: User) {
-  const { data } = await supabase
-    .from("organization_admins")
-    .select("organization_uid")
-    .eq("user_uid", user.id)
-    .single();
-
-  return !!data;
-}
 
 export function useAuthContext() {
   const context = useContext(AuthContext);
@@ -49,80 +37,17 @@ export default function AuthProvider({
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
-
-  useEffect(() => {
-    // Set up auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      setLoading(false);
-
-      if (event === "SIGNED_IN" && session?.user) {
-        const currentPath = window.location.pathname;
-
-        // Only redirect if we're coming from the auth page
-        if (currentPath === ROUTES.AUTH) {
-          // Defer the company check to avoid potential deadlocks
-          setTimeout(async () => {
-            try {
-              const { data: companyData } = await supabase
-                .from("organization_admins")
-                .select("organization_uid")
-                .eq("user_uid", session.user.id)
-                .single();
-
-              if (companyData) {
-                console.log(
-                  "Redirecting organization admin to organization dashboard"
-                );
-                setIsCompanyAdmin(true);
-                window.location.href = ROUTES.COMPANY_DASHBOARD;
-              } else {
-                console.log("Redirecting regular user to main page");
-                window.location.href = ROUTES.HOME;
-              }
-            } catch (error) {
-              console.log("No company profile found, redirecting to main page");
-              window.location.href = ROUTES.HOME;
-            }
-          }, 100);
-        }
-      }
-    });
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("\n\nhere: ", session);
-      setSession(session);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (isCompanyAdmin || !session?.user) return;
-
-    const checkUserType = async () => {
-      if (!session?.user) return;
-
-      const isOrganizationAdmin = await checkOrganizationAdmin(session?.user);
-      setIsCompanyAdmin(isOrganizationAdmin);
-    };
-
-    checkUserType();
-  }, [isCompanyAdmin, session?.user]);
 
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true);
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
       }
+      setLoading(false);
     };
     fetchUser();
   }, []);
@@ -168,7 +93,6 @@ export default function AuthProvider({
       console.error("Unexpected signOut error:", e);
     } finally {
       setSession(null);
-      setIsCompanyAdmin(false);
 
       window.location.href = ROUTES.AUTH;
     }
@@ -181,7 +105,6 @@ export default function AuthProvider({
     signIn,
     signOut,
     loading,
-    isCompanyAdmin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
