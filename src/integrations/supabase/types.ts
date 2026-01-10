@@ -98,74 +98,34 @@ export type Database = {
       organizations: {
         Row: {
           organization_uid: string
-          // user_uid: string
-          // address: string | null
+          admin_uid: string
+          address: string | null
           name: string
-          // contact_email: string
+          contact_email: string
           created_at: string | null
-          // description: string | null
-          // id: string
-          // is_approved: boolean | null
-          // phone: string | null
-          // updated_at: string | null
-          // user_id: string
-          // website: string | null
+          description: string | null
+          phone_number: string | null
+          website: string | null
         }
         Insert: {
           organization_uid: string
+          admin_uid: string
           name: string
-          // address?: string | null
-          // company_name: string
-          // contact_email: string
-          created_at?: string | null
-          // description?: string | null
-          // id?: string
-          // is_approved?: boolean | null
-          // phone?: string | null
-          // updated_at?: string | null
-          // user_id: string
-          // website?: string | null
+          address?: string | null
+          contact_email: string | null
+          description?: string | null
+          phone_number?: string | null
+          website?: string | null
         }
         Update: {
           name?: string
-          // address?: string | null
-          // company_name?: string
-          // contact_email?: string
-          // created_at?: string | null
-          // description?: string | null
-          // id?: string
-          // is_approved?: boolean | null
-          // phone?: string | null
-          // updated_at?: string | null
-          // user_id?: string
-          // website?: string | null
+          address?: string | null
+          contact_email?: string | null
+          description?: string | null
+          phone_number?: string | null
+          website?: string | null
         }
         Relationships: []
-      }
-      organization_admins: {
-        Row: {
-          organization_uid: string
-          user_uid: string
-          added_at: string | null
-        }
-        Insert: {
-          organization_uid: string
-          user_uid: string
-          added_at?: string | null
-        }
-        Update: {
-          organization_uid?: string
-          user_uid?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organization_admins_organization_uid_fkey"
-            columns: ["organization_uid"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["organization_uid"]
-          },
-        ]
       }
       packages: {
         Row: {

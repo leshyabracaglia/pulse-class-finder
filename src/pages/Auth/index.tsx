@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { ROUTES } from "@/App";
+import { ROUTES } from "@/pages/routes";
 import { AUTH_MODES, IAuthMode } from "./types";
 import SignUpForm from "./SignUpForm";
 import SignInForm from "./SignInForm";

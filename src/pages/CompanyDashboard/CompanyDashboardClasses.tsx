@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/legacy/card";
+import { Badge } from "@/components/ui/legacy/badge";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/legacy/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/legacy/select";
 import { Calendar, Clock, Users, Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import {

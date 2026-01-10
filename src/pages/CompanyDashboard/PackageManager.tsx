@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/components/ui/legacy/card";
+import { Badge } from "@/components/ui/legacy/badge";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/legacy/label";
+import { Textarea } from "@/components/ui/legacy/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/legacy/select";
 import { Package, Plus, Edit, Trash2, Clock, Users } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 
@@ -59,11 +59,7 @@ const PackageManager = ({ companyId }: PackageManagerProps) => {
   const [durationDays, setDurationDays] = useState(30);
   const [priceCents, setPriceCents] = useState(5000);
 
-  useEffect(() => {
-    fetchPackages();
-  }, [companyId]);
-
-  const fetchPackages = async () => {
+  const fetchPackages = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("packages")
@@ -88,7 +84,11 @@ const PackageManager = ({ companyId }: PackageManagerProps) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyId, toast]);
+
+  useEffect(() => {
+    fetchPackages();
+  }, [companyId, fetchPackages]);
 
   const resetForm = () => {
     setName("");

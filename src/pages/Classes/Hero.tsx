@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/legacy/button";
 import { useAuthContext } from "@/providers/AuthProvider";
 
 function ListYourClassesCTA() {

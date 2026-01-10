@@ -1,49 +1,16 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/legacy/button";
+import { Input } from "@/components/ui/Input";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/legacy/card";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useToast } from "@/hooks/useToast";
-import { ROUTES } from "@/App";
-
-export function AuthInput({
-  label,
-  id,
-  type,
-  placeholder,
-  value,
-  onChange,
-  required,
-}: {
-  label: string;
-  id: string;
-  type: string;
-  placeholder: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  required: boolean;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-      />
-    </div>
-  );
-}
+import { ROUTES } from "@/pages/routes";
 
 export function EmailAndPassword({
   email,
@@ -58,7 +25,7 @@ export function EmailAndPassword({
 }) {
   return (
     <>
-      <AuthInput
+      <Input
         label="Email"
         id="email"
         type="email"
@@ -67,7 +34,7 @@ export function EmailAndPassword({
         onChange={(e) => setEmail(e.target.value)}
         required
       />
-      <AuthInput
+      <Input
         label="Password"
         id="password"
         type="password"

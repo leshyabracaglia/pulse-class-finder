@@ -1,17 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/legacy/button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/legacy/label";
+import { Textarea } from "@/components/ui/legacy/textarea";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@/components/ui/legacy/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/legacy/avatar";
 import { Building, Globe, Mail, Phone } from "lucide-react";
 import { useCompanyProfileContext } from "./CompanyProfileProvider";
 import CompanyProfileProvider from "./CompanyProfileProvider";

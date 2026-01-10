@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/ui/legacy/card";
+import { Badge } from "@/components/ui/legacy/badge";
 import { Calendar, Clock, Users, User } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { formatDate, formatTime } from "@/lib/utils";

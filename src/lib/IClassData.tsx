@@ -10,7 +10,7 @@ export type IClassDifficulty =
 export interface IClassData {
   id: string;
   title: string;
-  // instructor: string;
+  // instructor_uid: string;
   class_time: string;
   class_date: string;
   // duration_minutes: number;

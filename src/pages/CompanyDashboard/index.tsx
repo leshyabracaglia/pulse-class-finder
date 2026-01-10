@@ -1,16 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/components/ui/legacy/card";
+import { Badge } from "@/components/ui/legacy/badge";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/legacy/tabs";
 import { Calendar, Building, Package } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import PackageManager from "@/pages/CompanyDashboard/PackageManager";

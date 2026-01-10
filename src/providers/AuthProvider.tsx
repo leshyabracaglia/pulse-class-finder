@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { ROUTES } from "@/App";
+import { ROUTES } from "@/pages/routes";
 
 interface IAuthContext {
   user: User | null;
@@ -10,7 +10,10 @@ interface IAuthContext {
     email: string,
     password: string,
     fullName: string
-  ) => Promise<{ error: AuthError | null }>;
+  ) => Promise<{
+    data: { user: User | null; session: Session | null };
+    error: AuthError | null;
+  }>;
   signIn: (
     email: string,
     password: string
@@ -52,10 +55,23 @@ export default function AuthProvider({
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    // Set up auth state listener
+    if (!user?.id) return;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_OUT" && session?.user) {
+        setUser(null);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [user]);
+
   const signUp = async (email: string, password: string, fullName: string) => {
     const redirectUrl = `${window.location.origin}/`;
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -65,7 +81,9 @@ export default function AuthProvider({
         },
       },
     });
-    return { error };
+    // setUser(data?.user);
+    // setSession(data?.session);
+    return { data, error };
   };
 
   const signIn = async (email: string, password: string) => {

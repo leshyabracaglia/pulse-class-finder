@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "@/components/ui/legacy/card";
+import { Badge } from "@/components/ui/legacy/badge";
 import { Calendar, Clock, Users, MapPin, Locate } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
 import useAvailableClasses, {
@@ -18,6 +18,7 @@ import useUserLocation, {
   LocationState,
 } from "./useUserLocation";
 import { useAuthContext } from "@/providers/AuthProvider";
+import { useOrganizationContext } from "@/providers/OrganizationProvider";
 
 function BookClassButton({ classItem }: { classItem: IAvailableClassData }) {
   const { bookClass } = useAvailableClasses();
@@ -41,7 +42,10 @@ function ClassCard({
   classItem: IAvailableClassData;
   userLocation: LocationState;
 }) {
-  const { user, isCompanyAdmin } = useAuthContext();
+  const { user } = useAuthContext();
+  const { organization } = useOrganizationContext();
+  const isCompanyAdmin = !!organization;
+
   const { bookClass } = useAvailableClasses();
 
   // Mock coordinates for demonstration - in a real app, you'd geocode the address
@@ -144,7 +148,8 @@ function ClassCard({
             }
           }}
           disabled={
-            isCompany || classItem.current_bookings >= classItem.max_capacity
+            isCompanyAdmin ||
+            classItem.current_bookings >= classItem.max_capacity
           }
         >
           {classItem.current_bookings >= classItem.max_capacity

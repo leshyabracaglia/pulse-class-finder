@@ -1,18 +1,21 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/legacy/button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/legacy/label";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@/components/ui/legacy/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/legacy/avatar";
 import { useToast } from "@/hooks/useToast";
 import { User } from "lucide-react";
 
@@ -31,13 +34,7 @@ export default function UserProfile() {
   const [saving, setSaving] = useState(false);
   const [fullName, setFullName] = useState("");
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -59,7 +56,13 @@ export default function UserProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [fetchProfile, user]);
 
   const updateProfile = async () => {
     if (!user) return;
@@ -112,7 +115,9 @@ export default function UserProfile() {
               <h1 className="text-xl font-semibold text-gray-900">
                 User Profile
               </h1>
-              <p className="text-sm text-gray-600">Manage your account settings</p>
+              <p className="text-sm text-gray-600">
+                Manage your account settings
+              </p>
             </div>
           </div>
         </div>
@@ -155,7 +160,7 @@ export default function UserProfile() {
                     type="email"
                     value={profile?.email || ""}
                     disabled
-                    className="bg-gray-50"
+                    onChange={() => {}}
                   />
                   <p className="text-sm text-gray-500 mt-1">
                     Email cannot be changed
