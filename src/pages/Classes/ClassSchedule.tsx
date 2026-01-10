@@ -10,17 +10,16 @@ import {
 import { Badge } from "@/components/ui/legacy/badge";
 import { Calendar, Clock, Users, MapPin, Locate } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
-import useAvailableClasses, {
-  IAvailableClassData,
-} from "./useAvailableClasses";
 import useUserLocation, {
   calculateDistance,
   LocationState,
 } from "./useUserLocation";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useOrganizationContext } from "@/providers/OrganizationProvider";
+import { useClassesContext } from "@/providers/ClassesProvider";
+import { IClassData } from "@/lib/IClassData";
 
-function BookClassButton({ classItem }: { classItem: IAvailableClassData }) {
+function BookClassButton({ classItem }: { classItem: IClassData }) {
   const { bookClass } = useAvailableClasses();
   return (
     <Button
@@ -39,7 +38,7 @@ function ClassCard({
   classItem,
   userLocation,
 }: {
-  classItem: IAvailableClassData;
+  classItem: IClassData;
   userLocation: LocationState;
 }) {
   const { user } = useAuthContext();
@@ -162,15 +161,10 @@ function ClassCard({
 }
 
 export default function ClassSchedule() {
-  const { classes, fetchClasses } = useAvailableClasses();
+  const { classes } = useClassesContext();
   const { location, requestLocation } = useUserLocation();
 
   const isLoading = !classes;
-
-  useEffect(() => {
-    fetchClasses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (isLoading) {
     return (

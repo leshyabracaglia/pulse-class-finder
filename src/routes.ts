@@ -3,8 +3,8 @@ export const ROUTES = {
   AUTH: "/",
   HOME: "/home",
   DASHBOARD: "/dashboard",
-  COMPANY_DASHBOARD: "/company-dashboard",
-  COMPANY_PROFILE: "/company-profile",
+  ORGANIZATION_SETTINGS: "/organization-settings",
+  ORGANIZATION_CLASSES: "/organization-classes",
   PROFILE: "/profile",
   CREATE_ORGANIZATION: "/create-organization",
 };

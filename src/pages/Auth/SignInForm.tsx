@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/legacy/card";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useToast } from "@/hooks/useToast";
-import { ROUTES } from "@/pages/routes";
+import { ROUTES } from "@/routes";
 
 export function EmailAndPassword({
   email,

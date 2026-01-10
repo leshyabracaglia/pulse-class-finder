@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { useAuthContext } from "./providers/AuthProvider";
 import { House } from "lucide-react";
 import { Button } from "./components/ui/legacy/button";
-import { ROUTES } from "./pages/routes";
+import { ROUTES } from "./routes";
 import { useEffect } from "react";
 import { useOrganizationContext } from "./providers/OrganizationProvider";
 import {
@@ -49,10 +49,9 @@ function UserMenu() {
         {isCompanyAdmin ? (
           <>
             <DropdownMenuItem asChild>
-              <Link to={ROUTES.COMPANY_DASHBOARD}>Company Dashboard</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={ROUTES.COMPANY_PROFILE}>Company Profile</Link>
+              <Link to={ROUTES.ORGANIZATION_SETTINGS}>
+                Organization Settings
+              </Link>
             </DropdownMenuItem>
           </>
         ) : (

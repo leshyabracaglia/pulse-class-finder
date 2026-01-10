@@ -47,28 +47,22 @@ export type Database = {
           class_date: string
           class_time: string
           // class_type: string
-          // company_id: string | null
           created_at: string | null
           // current_bookings: number
           // difficulty: string | null
           // duration_minutes: number
           id: string
-          // instructor: string
+          instructor_uid: string
           max_capacity: number
           title: string
         }
         Insert: {
           class_date: string
           class_time: string
-          class_type: string
-          company_id?: string | null
+          organization_uid: string
           created_at?: string | null
-          current_bookings?: number
-          difficulty?: string | null
-          duration_minutes: number
-          id?: string
-          instructor: string
-          max_capacity?: number
+          instructor_uid: string
+          max_capacity: number
           title: string
         }
         Update: {
