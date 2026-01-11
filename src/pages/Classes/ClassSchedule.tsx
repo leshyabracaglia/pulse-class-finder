@@ -19,20 +19,20 @@ import { useOrganizationContext } from "@/providers/OrganizationProvider";
 import { useClassesContext } from "@/providers/ClassesProvider";
 import { IClassData } from "@/lib/IClassData";
 
-function BookClassButton({ classItem }: { classItem: IClassData }) {
-  const { bookClass } = useAvailableClasses();
-  return (
-    <Button
-      className="w-full"
-      onClick={() => bookClass(classItem.id)}
-      disabled={classItem.current_bookings >= classItem.max_capacity}
-    >
-      {classItem.current_bookings >= classItem.max_capacity
-        ? "Class Full"
-        : "Book Class"}
-    </Button>
-  );
-}
+// function BookClassButton({ classItem }: { classItem: IClassData }) {
+//   const { createBooking } = useBookingsContext();
+//   return (
+//     <Button
+//       className="w-full"
+//       onClick={() => bookClass(classItem.id)}
+//       disabled={classItem.current_bookings >= classItem.max_capacity}
+//     >
+//       {classItem.current_bookings >= classItem.max_capacity
+//         ? "Class Full"
+//         : "Book Class"}
+//     </Button>
+//   );
+// }
 
 function ClassCard({
   classItem,
@@ -45,43 +45,43 @@ function ClassCard({
   const { organization } = useOrganizationContext();
   const isCompanyAdmin = !!organization;
 
-  const { bookClass } = useAvailableClasses();
+  // const { bookClass } = useAvailableClasses();
 
   // Mock coordinates for demonstration - in a real app, you'd geocode the address
-  const getDistance = () => {
-    if (
-      !userLocation.latitude ||
-      !userLocation.longitude ||
-      !classItem.companies?.address
-    ) {
-      return null;
-    }
+  // const getDistance = () => {
+  //   if (
+  //     !userLocation.latitude ||
+  //     !userLocation.longitude ||
+  //     !classItem.companies?.address
+  //   ) {
+  //     return null;
+  //   }
 
-    // Mock coordinates for different addresses (in a real app, you'd use geocoding)
-    const mockCoordinates: { [key: string]: { lat: number; lng: number } } = {
-      "123 Main St": { lat: 40.7128, lng: -74.006 },
-      "456 Oak Ave": { lat: 40.7589, lng: -73.9851 },
-      "789 Pine Rd": { lat: 40.6892, lng: -74.0445 },
-    };
+  //   // Mock coordinates for different addresses (in a real app, you'd use geocoding)
+  //   const mockCoordinates: { [key: string]: { lat: number; lng: number } } = {
+  //     "123 Main St": { lat: 40.7128, lng: -74.006 },
+  //     "456 Oak Ave": { lat: 40.7589, lng: -73.9851 },
+  //     "789 Pine Rd": { lat: 40.6892, lng: -74.0445 },
+  //   };
 
-    const addressKey = Object.keys(mockCoordinates).find((addr) =>
-      classItem.companies?.address?.includes(addr.split(" ")[1])
-    );
+  //   const addressKey = Object.keys(mockCoordinates).find((addr) =>
+  //     classItem.companies?.address?.includes(addr.split(" ")[1])
+  //   );
 
-    if (addressKey) {
-      const coords = mockCoordinates[addressKey];
-      return calculateDistance(
-        userLocation.latitude,
-        userLocation.longitude,
-        coords.lat,
-        coords.lng
-      );
-    }
+  //   if (addressKey) {
+  //     const coords = mockCoordinates[addressKey];
+  //     return calculateDistance(
+  //       userLocation.latitude,
+  //       userLocation.longitude,
+  //       coords.lat,
+  //       coords.lng
+  //     );
+  //   }
 
-    return null;
-  };
+  //   return null;
+  // };
 
-  const distance = getDistance();
+  // const distance = getDistance();
 
   return (
     <Card key={classItem.id} className="hover:shadow-lg transition-shadow">
@@ -89,12 +89,12 @@ function ClassCard({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl">{classItem.title}</CardTitle>
-            <CardDescription>with {classItem.instructor}</CardDescription>
+            <CardDescription>with {classItem.instructor_uid}</CardDescription>
           </div>
-          <div className="flex gap-1 flex-col">
+          {/* <div className="flex gap-1 flex-col">
             <Badge variant="outline">{classItem.class_type}</Badge>
             <Badge variant="secondary">{classItem.difficulty}</Badge>
-          </div>
+          </div> */}
         </div>
       </CardHeader>
       <CardContent>
@@ -105,18 +105,15 @@ function ClassCard({
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Clock className="w-4 h-4" />
-            <span className="text-sm">
-              {formatTime(classItem.class_time)} ({classItem.duration_minutes}{" "}
-              min)
-            </span>
+            <span className="text-sm">{formatTime(classItem.class_time)}</span>
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Users className="w-4 h-4" />
-            <span className="text-sm">
+            {/* <span className="text-sm">
               {classItem.current_bookings}/{classItem.max_capacity} spots filled
-            </span>
+            </span> */}
           </div>
-          {classItem.companies?.address && (
+          {/* {classItem.companies?.address && (
             <div className="flex items-center gap-2 text-gray-600">
               <MapPin className="w-4 h-4" />
               <div className="flex flex-col">
@@ -128,32 +125,33 @@ function ClassCard({
                 )}
               </div>
             </div>
-          )}
+          )} */}
         </div>
-
+        {/* 
         {classItem.companies?.company_name && (
           <p className="text-sm text-gray-500 mb-4">
             Hosted by {classItem.companies.company_name}
           </p>
-        )}
+        )} */}
 
         <Button
           className="w-full"
           onClick={() => {
-            if (user) {
-              bookClass(classItem.id);
-            } else {
-              window.location.href = "/auth";
-            }
+            // if (user) {
+            //   bookClass(classItem.id);
+            // } else {
+            //   window.location.href = "/auth";
+            // }
           }}
           disabled={
-            isCompanyAdmin ||
-            classItem.current_bookings >= classItem.max_capacity
+            isCompanyAdmin
+            // classItem.current_bookings >= classItem.max_capacity
           }
         >
-          {classItem.current_bookings >= classItem.max_capacity
+          {/* {classItem.current_bookings >= classItem.max_capacity
             ? "Class Full"
-            : "Book Class"}
+            : "Book Class"} */}
+          Book Class
         </Button>
       </CardContent>
     </Card>

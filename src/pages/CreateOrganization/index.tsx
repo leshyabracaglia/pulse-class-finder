@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/legacy/button";
 import { Input } from "@/components/ui/Input";
 import { useOrganizationContext } from "@/providers/OrganizationProvider";
 import { toast } from "@/hooks/useToast";
-import { ROUTES } from "../routes";
+import { ROUTES } from "../../routes";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateOrganization() {
@@ -46,7 +46,7 @@ export default function CreateOrganization() {
           title: "Organization created",
           description: "Your organization has been created",
         });
-        navigate(ROUTES.COMPANY_DASHBOARD);
+        navigate(ROUTES.ORGANIZATION_SETTINGS);
       } else {
         toast({
           title: "Error",

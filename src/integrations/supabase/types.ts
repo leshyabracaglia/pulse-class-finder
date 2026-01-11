@@ -121,6 +121,28 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_instructors: {
+        Row: {
+          instructor_uid: string
+          organization_uid: string
+          name: string
+          email: string
+          phone_number: string
+        }
+        Insert: {
+          instructor_uid: string
+          organization_uid: string
+          name: string
+          email: string
+          phone_number: string
+        }
+        Update: {
+          name?: string
+          email?: string
+          phone_number?: string
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
           class_count: number | null

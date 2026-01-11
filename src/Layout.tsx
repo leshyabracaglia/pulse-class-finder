@@ -53,6 +53,9 @@ function UserMenu() {
                 Organization Settings
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to={ROUTES.ORGANIZATION_CLASSES}>Organization Classes</Link>
+            </DropdownMenuItem>
           </>
         ) : (
           <DropdownMenuItem asChild>

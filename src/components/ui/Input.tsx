@@ -36,7 +36,15 @@ export function Input({
 }: {
   label?: string;
   id: string;
-  type?: "text" | "email" | "tel" | "url" | "password" | "number";
+  type?:
+    | "text"
+    | "email"
+    | "tel"
+    | "url"
+    | "password"
+    | "number"
+    | "date"
+    | "time";
   placeholder?: string;
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

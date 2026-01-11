@@ -49,7 +49,6 @@ const PackageManager = ({ companyId }: PackageManagerProps) => {
   );
   const { toast } = useToast();
 
-  // Form states
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [packageType, setPackageType] = useState<"class_count" | "time_based">(

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { ROUTES } from "@/pages/routes";
+import { ROUTES } from "@/routes";
 
 interface IAuthContext {
   user: User | null;
