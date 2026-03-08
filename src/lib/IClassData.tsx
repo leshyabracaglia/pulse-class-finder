@@ -14,9 +14,8 @@ export interface IClassData {
   title: string;
   class_time: string;
   class_date: string;
-  // duration_minutes: number;
-  // difficulty: IClassDifficulty;
-  // class_type: string;
   max_capacity: number;
-  // current_bookings: number;
+  current_bookings: number;
+  instructor_name?: string;
+  organization_name?: string;
 }

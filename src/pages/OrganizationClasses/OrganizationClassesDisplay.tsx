@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
@@ -10,21 +9,23 @@ import {
 } from "@/components/ui/legacy/card";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/legacy/label";
-import { Calendar, Clock, Plus, Edit, Trash2, User } from "lucide-react";
+import { Calendar, Clock, Plus, Edit, Trash2, Users } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { IClassData } from "@/lib/IClassData";
 import { useOrganizationContext } from "@/providers/OrganizationProvider";
-import { IOrganizationData } from "@/lib/IOrganizationData";
 import InstructorSelector from "./InstructorSelector";
 import { useClassesContext } from "@/providers/ClassesProvider";
+import AttendanceView from "./AttendanceView";
 
 function AddEditClassForm({
   editingClass,
+  onClose,
 }: {
-  editingClass: IClassData | undefined;
+  editingClass: IClassData | null;
+  onClose: () => void;
 }) {
   const { toast } = useToast();
-  const { createClass } = useClassesContext();
+  const { createClass, updateClass } = useClassesContext();
   const { organization } = useOrganizationContext();
 
   const [classData, setClassData] = useState<IClassData>({
@@ -35,31 +36,35 @@ function AddEditClassForm({
     class_time: editingClass?.class_time || "",
     class_date: editingClass?.class_date || "",
     max_capacity: editingClass?.max_capacity || 0,
+    current_bookings: editingClass?.current_bookings || 0,
   });
 
-  const resetForm = () => {
+  useEffect(() => {
     setClassData({
-      id: "",
-      organization_uid: "",
-      instructor_uid: "",
-      title: "",
-      class_time: "",
-      class_date: "",
-      max_capacity: 0,
+      id: editingClass?.id || crypto.randomUUID(),
+      organization_uid: organization.organization_uid,
+      instructor_uid: editingClass?.instructor_uid || "",
+      title: editingClass?.title || "",
+      class_time: editingClass?.class_time || "",
+      class_date: editingClass?.class_date || "",
+      max_capacity: editingClass?.max_capacity || 0,
+      current_bookings: editingClass?.current_bookings || 0,
     });
-  };
+  }, [editingClass]);
 
   const handleSubmitClass = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!organization) return;
 
     try {
-      const success = await createClass(classData);
+      const success = editingClass
+        ? await updateClass(classData)
+        : await createClass(classData);
 
       if (!success) {
         toast({
           title: "Error",
-          description: "Failed to create class.",
+          description: editingClass ? "Failed to update class." : "Failed to create class.",
           variant: "destructive",
         });
         return;
@@ -67,10 +72,10 @@ function AddEditClassForm({
 
       toast({
         title: "Success",
-        description: "Class created successfully.",
+        description: editingClass ? "Class updated successfully." : "Class created successfully.",
       });
 
-      resetForm();
+      onClose();
     } catch (error) {
       console.error("Error saving class:", error);
       toast({
@@ -139,23 +144,6 @@ function AddEditClassForm({
               required
             />
           </div>
-          {/* <div>
-            <Label htmlFor="duration">Duration (minutes)</Label>
-            <Input
-              id="duration"
-              type="number"
-              value={classData.duration_minutes}
-              onChange={(e) =>
-                setClassData({
-                  ...classData,
-                  duration_minutes: Number(e.target.value),
-                })
-              }
-              min="15"
-              max="180"
-              required
-            />
-          </div> */}
           <div>
             <Label htmlFor="maxCapacity">Max Capacity</Label>
             <Input
@@ -177,7 +165,7 @@ function AddEditClassForm({
             <Button type="submit">
               {editingClass ? "Update Class" : "Create Class"}
             </Button>
-            <Button type="button" variant="outline" onClick={resetForm}>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
           </div>
@@ -190,34 +178,21 @@ function AddEditClassForm({
 function ClassCard({
   classItem,
   handleEditClass,
+  onViewAttendance,
 }: {
   classItem: IClassData;
   handleEditClass: (classItem: IClassData) => void;
+  onViewAttendance: (classItem: IClassData) => void;
 }) {
   const { toast } = useToast();
+  const { deleteClass } = useClassesContext();
 
   const handleDeleteClass = async (classId: string) => {
     if (!confirm("Are you sure you want to delete this class?")) return;
 
-    try {
-      const { error } = await supabase
-        .from("classes")
-        .delete()
-        .eq("id", classId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Class deleted successfully.",
-      });
-    } catch (error) {
-      console.error("Error deleting class:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete class.",
-        variant: "destructive",
-      });
+    const success = await deleteClass(classId);
+    if (success) {
+      toast({ title: "Success", description: "Class deleted successfully." });
     }
   };
 
@@ -230,11 +205,18 @@ function ClassCard({
             <CardDescription>with {classItem.instructor_uid}</CardDescription>
           </div>
           <div className="flex gap-2">
-            {/* <Badge variant="outline">{classItem.class_type}</Badge>
-            <Badge variant="secondary">{classItem.difficulty}</Badge> */}
             <Button
               size="sm"
               variant="outline"
+              aria-label="View bookings"
+              onClick={() => onViewAttendance(classItem)}
+            >
+              <Users className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              aria-label="Edit class"
               onClick={() => handleEditClass(classItem)}
             >
               <Edit className="w-4 h-4" />
@@ -242,6 +224,7 @@ function ClassCard({
             <Button
               size="sm"
               variant="outline"
+              aria-label="Delete class"
               onClick={() => handleDeleteClass(classItem.id)}
             >
               <Trash2 className="w-4 h-4" />
@@ -259,25 +242,6 @@ function ClassCard({
             <Clock className="w-4 h-4" />
             <span>{classItem.class_time}</span>
           </div>
-          {/* <div className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            <span>
-              {classItem.current_bookings}/{classItem.max_capacity} booked
-            </span>
-          </div> */}
-          {/* <div className="flex items-center gap-2">
-            <span
-              className={`px-2 py-1 rounded-full text-xs ${
-                classItem.current_bookings >= classItem.max_capacity
-                  ? "bg-red-100 text-red-800"
-                  : "bg-green-100 text-green-800"
-              }`}
-            >
-              {classItem.current_bookings >= classItem.max_capacity
-                ? "Full"
-                : "Available"}
-            </span>
-          </div> */}
         </div>
       </CardContent>
     </Card>
@@ -289,6 +253,7 @@ export default function OrganizationClassesDisplay() {
 
   const [showAddClass, setShowAddClass] = useState(false);
   const [editingClass, setEditingClass] = useState<IClassData | null>(null);
+  const [attendanceClass, setAttendanceClass] = useState<IClassData | null>(null);
 
   const isLoading = !organization || !organizationClasses;
 
@@ -307,12 +272,17 @@ export default function OrganizationClassesDisplay() {
           <h2 className="text-2xl font-bold text-gray-900">Your Classes</h2>
           <p className="text-gray-600">Manage your fitness classes</p>
         </div>
-        <Button onClick={() => setShowAddClass(true)}>
+        <Button onClick={() => { setEditingClass(null); setShowAddClass(true); }}>
           <Plus className="w-4 h-4 mr-2" />
           Add Class
         </Button>
       </div>
-      {showAddClass && <AddEditClassForm editingClass={editingClass} />}
+      {showAddClass && (
+        <AddEditClassForm
+          editingClass={editingClass}
+          onClose={() => { setShowAddClass(false); setEditingClass(null); }}
+        />
+      )}
       {organizationClasses.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -323,7 +293,7 @@ export default function OrganizationClassesDisplay() {
             <p className="text-gray-600 mb-4">
               Start by creating your first fitness class.
             </p>
-            <Button onClick={() => setShowAddClass(true)}>
+            <Button onClick={() => { setEditingClass(null); setShowAddClass(true); }}>
               <Plus className="w-4 h-4 mr-2" />
               Add Your First Class
             </Button>
@@ -339,9 +309,20 @@ export default function OrganizationClassesDisplay() {
                 setEditingClass(classItem);
                 setShowAddClass(true);
               }}
+              onViewAttendance={(c) => setAttendanceClass(c)}
             />
           ))}
         </div>
+      )}
+      {attendanceClass && (
+        <AttendanceView
+          classId={attendanceClass.id}
+          classTitle={attendanceClass.title}
+          maxCapacity={attendanceClass.max_capacity}
+          currentBookings={attendanceClass.current_bookings}
+          open={!!attendanceClass}
+          onClose={() => setAttendanceClass(null)}
+        />
       )}
     </>
   );

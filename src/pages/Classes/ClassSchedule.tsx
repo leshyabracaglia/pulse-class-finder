@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
@@ -7,81 +7,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/legacy/card";
-import { Badge } from "@/components/ui/legacy/badge";
-import { Calendar, Clock, Users, MapPin, Locate } from "lucide-react";
+import { Input } from "@/components/ui/Input";
+import { Building, Calendar, Clock, Locate, Users } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
-import useUserLocation, {
-  calculateDistance,
-  LocationState,
-} from "./useUserLocation";
-import { useAuthContext } from "@/providers/AuthProvider";
+import useUserLocation from "./useUserLocation";
 import { useOrganizationContext } from "@/providers/OrganizationProvider";
 import { useClassesContext } from "@/providers/ClassesProvider";
 import { IClassData } from "@/lib/IClassData";
 
-// function BookClassButton({ classItem }: { classItem: IClassData }) {
-//   const { createBooking } = useBookingsContext();
-//   return (
-//     <Button
-//       className="w-full"
-//       onClick={() => bookClass(classItem.id)}
-//       disabled={classItem.current_bookings >= classItem.max_capacity}
-//     >
-//       {classItem.current_bookings >= classItem.max_capacity
-//         ? "Class Full"
-//         : "Book Class"}
-//     </Button>
-//   );
-// }
-
-function ClassCard({
-  classItem,
-  userLocation,
-}: {
-  classItem: IClassData;
-  userLocation: LocationState;
-}) {
-  const { user } = useAuthContext();
+function ClassCard({ classItem }: { classItem: IClassData }) {
   const { organization } = useOrganizationContext();
+  const { bookClass } = useClassesContext();
+
   const isCompanyAdmin = !!organization;
+  const isFull = classItem.current_bookings >= classItem.max_capacity;
 
-  // const { bookClass } = useAvailableClasses();
-
-  // Mock coordinates for demonstration - in a real app, you'd geocode the address
-  // const getDistance = () => {
-  //   if (
-  //     !userLocation.latitude ||
-  //     !userLocation.longitude ||
-  //     !classItem.companies?.address
-  //   ) {
-  //     return null;
-  //   }
-
-  //   // Mock coordinates for different addresses (in a real app, you'd use geocoding)
-  //   const mockCoordinates: { [key: string]: { lat: number; lng: number } } = {
-  //     "123 Main St": { lat: 40.7128, lng: -74.006 },
-  //     "456 Oak Ave": { lat: 40.7589, lng: -73.9851 },
-  //     "789 Pine Rd": { lat: 40.6892, lng: -74.0445 },
-  //   };
-
-  //   const addressKey = Object.keys(mockCoordinates).find((addr) =>
-  //     classItem.companies?.address?.includes(addr.split(" ")[1])
-  //   );
-
-  //   if (addressKey) {
-  //     const coords = mockCoordinates[addressKey];
-  //     return calculateDistance(
-  //       userLocation.latitude,
-  //       userLocation.longitude,
-  //       coords.lat,
-  //       coords.lng
-  //     );
-  //   }
-
-  //   return null;
-  // };
-
-  // const distance = getDistance();
+  const handleBook = async () => {
+    await bookClass(classItem.id);
+  };
 
   return (
     <Card key={classItem.id} className="hover:shadow-lg transition-shadow">
@@ -89,12 +32,16 @@ function ClassCard({
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-xl">{classItem.title}</CardTitle>
-            <CardDescription>with {classItem.instructor_uid}</CardDescription>
+            <CardDescription>
+              with {classItem.instructor_name || classItem.instructor_uid}
+            </CardDescription>
+            {classItem.organization_name && (
+              <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                <Building className="w-3 h-3" />
+                {classItem.organization_name}
+              </p>
+            )}
           </div>
-          {/* <div className="flex gap-1 flex-col">
-            <Badge variant="outline">{classItem.class_type}</Badge>
-            <Badge variant="secondary">{classItem.difficulty}</Badge>
-          </div> */}
         </div>
       </CardHeader>
       <CardContent>
@@ -109,49 +56,18 @@ function ClassCard({
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Users className="w-4 h-4" />
-            {/* <span className="text-sm">
+            <span className="text-sm">
               {classItem.current_bookings}/{classItem.max_capacity} spots filled
-            </span> */}
+            </span>
           </div>
-          {/* {classItem.companies?.address && (
-            <div className="flex items-center gap-2 text-gray-600">
-              <MapPin className="w-4 h-4" />
-              <div className="flex flex-col">
-                <span className="text-sm">{classItem.companies.address}</span>
-                {distance && (
-                  <span className="text-xs text-blue-600 font-medium">
-                    {distance.toFixed(1)} miles away
-                  </span>
-                )}
-              </div>
-            </div>
-          )} */}
         </div>
-        {/* 
-        {classItem.companies?.company_name && (
-          <p className="text-sm text-gray-500 mb-4">
-            Hosted by {classItem.companies.company_name}
-          </p>
-        )} */}
 
         <Button
           className="w-full"
-          onClick={() => {
-            // if (user) {
-            //   bookClass(classItem.id);
-            // } else {
-            //   window.location.href = "/auth";
-            // }
-          }}
-          disabled={
-            isCompanyAdmin
-            // classItem.current_bookings >= classItem.max_capacity
-          }
+          onClick={handleBook}
+          disabled={isCompanyAdmin || isFull}
         >
-          {/* {classItem.current_bookings >= classItem.max_capacity
-            ? "Class Full"
-            : "Book Class"} */}
-          Book Class
+          {isFull ? "Class Full" : "Book Class"}
         </Button>
       </CardContent>
     </Card>
@@ -162,7 +78,25 @@ export default function ClassSchedule() {
   const { classes } = useClassesContext();
   const { location, requestLocation } = useUserLocation();
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+
   const isLoading = !classes;
+
+  const filteredClasses = useMemo(() => {
+    if (!classes) return [];
+    return classes.filter((c) => {
+      const matchesSearch =
+        !searchQuery ||
+        c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.instructor_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.organization_name || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesDate = !filterDate || c.class_date === filterDate;
+      return matchesSearch && matchesDate;
+    });
+  }, [classes, searchQuery, filterDate]);
+
+  const hasFilters = searchQuery || filterDate;
 
   if (isLoading) {
     return (
@@ -176,8 +110,6 @@ export default function ClassSchedule() {
     );
   }
 
-  const hasUpcomingClasses = !!classes?.length;
-
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -186,7 +118,7 @@ export default function ClassSchedule() {
             Upcoming Classes
           </h2>
 
-          {hasUpcomingClasses && (
+          {classes.length > 0 && (
             <div className="flex justify-center">
               <Button
                 onClick={requestLocation}
@@ -209,22 +141,54 @@ export default function ClassSchedule() {
           )}
         </div>
 
-        {classes.length === 0 ? (
+        {classes.length > 0 && (
+          <div className="flex flex-col sm:flex-row gap-3 mb-8">
+            <Input
+              className="flex-1"
+              placeholder="Search by class, instructor, or studio..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Input
+              type="date"
+              className="sm:w-48"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+            />
+            {hasFilters && (
+              <Button
+                variant="outline"
+                onClick={() => { setSearchQuery(""); setFilterDate(""); }}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        )}
+
+        {filteredClasses.length === 0 ? (
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No upcoming classes
-            </h3>
-            <p className="text-gray-600">Check back soon for new classes!</p>
+            {hasFilters ? (
+              <>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No matching classes
+                </h3>
+                <p className="text-gray-600">Try clearing your filters.</p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No upcoming classes
+                </h3>
+                <p className="text-gray-600">Check back soon for new classes!</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {classes.map((classItem) => (
-              <ClassCard
-                key={classItem.id}
-                classItem={classItem}
-                userLocation={location}
-              />
+            {filteredClasses.map((classItem) => (
+              <ClassCard key={classItem.id} classItem={classItem} />
             ))}
           </div>
         )}
