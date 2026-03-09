@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/legacy/card";
-import { Badge } from "@/components/ui/legacy/badge";
 import { Calendar, Clock, Users, User } from "lucide-react";
 import { useToast } from "@/hooks/useToast";
 import { formatDate, formatTime } from "@/lib/utils";
@@ -21,17 +20,15 @@ interface Booking {
   booked_at: string;
   classes: {
     title: string;
-    instructor: string;
+    instructor_uid: string;
     class_time: string;
     class_date: string;
-    duration_minutes: number;
-    class_type: string;
-    difficulty: string;
+    max_capacity: number;
   };
 }
 
 const UserDashboard = () => {
-  const { user, signOut } = useAuthContext();
+  const { user } = useAuthContext();
   const { toast } = useToast();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -50,15 +47,16 @@ const UserDashboard = () => {
         .from("bookings")
         .select(
           `
-          *,
+          id,
+          class_id,
+          booking_status,
+          booked_at,
           classes (
             title,
-            instructor,
+            instructor_uid,
             class_time,
             class_date,
-            duration_minutes,
-            class_type,
-            difficulty
+            max_capacity
           )
         `
         )
@@ -67,7 +65,7 @@ const UserDashboard = () => {
         .order("booked_at", { ascending: false });
 
       if (error) throw error;
-      setBookings(data || []);
+      setBookings((data as Booking[]) || []);
     } catch (error) {
       console.error("Error fetching bookings:", error);
       toast({
@@ -80,7 +78,7 @@ const UserDashboard = () => {
     }
   };
 
-  const cancelBooking = async (bookingId: string, classId: string) => {
+  const cancelBooking = async (bookingId: string) => {
     try {
       const { error } = await supabase
         .from("bookings")
@@ -89,31 +87,12 @@ const UserDashboard = () => {
 
       if (error) throw error;
 
-      // Update current_bookings count by decrementing it
-      const { data: classData, error: fetchError } = await supabase
-        .from("classes")
-        .select("current_bookings")
-        .eq("id", classId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const { error: updateError } = await supabase
-        .from("classes")
-        .update({
-          current_bookings: Math.max(0, classData.current_bookings - 1),
-        })
-        .eq("id", classId);
-
-      if (updateError)
-        console.error("Error updating class capacity:", updateError);
-
       toast({
         title: "Success",
         description: "Booking cancelled successfully.",
       });
 
-      fetchBookings();
+      setBookings((prev) => prev.filter((b) => b.id !== bookingId));
     } catch (error) {
       console.error("Error cancelling booking:", error);
       toast({
@@ -145,17 +124,12 @@ const UserDashboard = () => {
               <p className="text-sm text-gray-600">{user?.email}</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => (window.location.href = "/")}
-            >
-              Browse Classes
-            </Button>
-            <Button variant="outline" onClick={signOut}>
-              Sign Out
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/home")}
+          >
+            Browse Classes
+          </Button>
         </div>
       </div>
 
@@ -177,7 +151,7 @@ const UserDashboard = () => {
               <p className="text-gray-600 mb-4">
                 You haven't booked any classes yet.
               </p>
-              <Button onClick={() => (window.location.href = "/")}>
+              <Button onClick={() => (window.location.href = "/home")}>
                 Browse Available Classes
               </Button>
             </CardContent>
@@ -196,16 +170,8 @@ const UserDashboard = () => {
                         {booking.classes.title}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        with {booking.classes.instructor}
+                        Instructor: {booking.classes.instructor_uid}
                       </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      <Badge variant="outline">
-                        {booking.classes.class_type}
-                      </Badge>
-                      <Badge variant="secondary">
-                        {booking.classes.difficulty}
-                      </Badge>
                     </div>
                   </div>
                 </CardHeader>
@@ -220,8 +186,7 @@ const UserDashboard = () => {
                     <div className="flex items-center gap-2 text-gray-600">
                       <Clock className="w-4 h-4" />
                       <span className="text-sm">
-                        {formatTime(booking.classes.class_time)} (
-                        {booking.classes.duration_minutes} min)
+                        {formatTime(booking.classes.class_time)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
@@ -237,9 +202,7 @@ const UserDashboard = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        cancelBooking(booking.id, booking.class_id)
-                      }
+                      onClick={() => cancelBooking(booking.id)}
                     >
                       Cancel Booking
                     </Button>
