@@ -1,0 +1,23 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/attendance/route": "/api/attendance",
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
+  "/api/bookings/[id]/route": "/api/bookings/[id]",
+  "/api/bookings/route": "/api/bookings",
+  "/api/classes/[id]/route": "/api/classes/[id]",
+  "/api/classes/route": "/api/classes",
+  "/api/instructors/route": "/api/instructors",
+  "/api/packages/[id]/route": "/api/packages/[id]",
+  "/api/organizations/route": "/api/organizations",
+  "/api/packages/route": "/api/packages",
+  "/api/profiles/route": "/api/profiles",
+  "/api/register/route": "/api/register",
+  "/login/page": "/login",
+  "/page": "/",
+  "/(protected)/dashboard/page": "/dashboard",
+  "/(protected)/home/page": "/home",
+  "/(protected)/organization-classes/page": "/organization-classes",
+  "/(protected)/create-organization/page": "/create-organization",
+  "/(protected)/organization-settings/page": "/organization-settings",
+  "/(protected)/profile/page": "/profile"
+}

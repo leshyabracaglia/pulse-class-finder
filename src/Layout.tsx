@@ -1,9 +1,12 @@
-import { Link, useLocation } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { useAuthContext } from "./providers/AuthProvider";
 import { House } from "lucide-react";
 import { Button } from "./components/ui/legacy/button";
-import { ROUTES } from "./routes";
+import { ROUTES } from "./lib/routes";
 import { useEffect } from "react";
 import { useOrganizationContext } from "./providers/OrganizationProvider";
 import {
@@ -21,7 +24,7 @@ function UserMenu() {
 
   if (!user) return null;
 
-  const fullName = user?.identities?.[0]?.identity_data?.full_name;
+  const fullName = user.name;
   const isCompanyAdmin = !!organization;
 
   return (
@@ -40,26 +43,26 @@ function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to={ROUTES.PROFILE}>Profile</Link>
+          <Link href={ROUTES.PROFILE}>Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to={ROUTES.DASHBOARD}>User Dashboard</Link>
+          <Link href={ROUTES.DASHBOARD}>User Dashboard</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {isCompanyAdmin ? (
           <>
             <DropdownMenuItem asChild>
-              <Link to={ROUTES.ORGANIZATION_SETTINGS}>
+              <Link href={ROUTES.ORGANIZATION_SETTINGS}>
                 Organization Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to={ROUTES.ORGANIZATION_CLASSES}>Organization Classes</Link>
+              <Link href={ROUTES.ORGANIZATION_CLASSES}>Organization Classes</Link>
             </DropdownMenuItem>
           </>
         ) : (
           <DropdownMenuItem asChild>
-            <Link to={ROUTES.CREATE_ORGANIZATION}>Create Organization</Link>
+            <Link href={ROUTES.CREATE_ORGANIZATION}>Create Organization</Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
@@ -75,7 +78,7 @@ function AppHeader() {
   return (
     <div className="border-b bg-background">
       <div className="flex h-16 items-center px-4 flex-row justify-between">
-        <Link to={ROUTES.HOME}>
+        <Link href={ROUTES.HOME}>
           <Button variant="ghost" size="icon">
             <House />
           </Button>
@@ -87,30 +90,19 @@ function AppHeader() {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuthContext();
   const { organization, fetchOrganization } = useOrganizationContext();
-
-  const location = useLocation();
-
-  const isAuthPage = location.pathname === ROUTES.AUTH;
+  const { user, loading } = useAuthContext();
 
   useEffect(() => {
-    if (!isAuthPage && !user && !loading) {
-      console.log("User is not logged in, redirecting to auth page");
-      window.location.href = ROUTES.AUTH;
-    }
-  }, [user, isAuthPage, loading]);
-
-  useEffect(() => {
-    if (!isAuthPage && !loading && user && !organization) {
+    if (!loading && user && !organization) {
       fetchOrganization();
     }
-  }, [user, fetchOrganization, organization, isAuthPage, loading]);
+  }, [user, fetchOrganization, organization, loading]);
 
   return (
     <div className="min-h-screen flex w-full">
       <main className="flex-1">
-        {!isAuthPage && <AppHeader />}
+        <AppHeader />
         <div className="flex-1">{children}</div>
       </main>
     </div>

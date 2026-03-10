@@ -1,19 +1,19 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import OrganizationClassesDisplay from "@/pages/OrganizationClasses/OrganizationClassesDisplay";
+import OrganizationClassesDisplay from "@/views/OrganizationClasses/OrganizationClassesDisplay";
 import { useClassesContext } from "@/providers/ClassesProvider";
 import { useOrganizationContext } from "@/providers/OrganizationProvider";
 
 vi.mock("@/providers/ClassesProvider", () => ({ useClassesContext: vi.fn() }));
 vi.mock("@/providers/OrganizationProvider", () => ({ useOrganizationContext: vi.fn() }));
 vi.mock("@/hooks/useToast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
-vi.mock("@/pages/OrganizationClasses/InstructorSelector", () => ({
+vi.mock("@/views/OrganizationClasses/InstructorSelector", () => ({
   default: ({ instructorUid }: { instructorUid: string }) => (
     <div data-testid="instructor-selector">{instructorUid}</div>
   ),
 }));
-vi.mock("@/pages/OrganizationClasses/AttendanceView", () => ({
+vi.mock("@/views/OrganizationClasses/AttendanceView", () => ({
   default: ({ open, classTitle }: { open: boolean; classTitle: string }) =>
     open ? <div data-testid="attendance-dialog">Attendance for {classTitle}</div> : null,
 }));

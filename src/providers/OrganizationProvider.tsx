@@ -1,3 +1,5 @@
+"use client";
+
 import React, {
   createContext,
   useCallback,
@@ -6,7 +8,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "./AuthProvider";
 import { IOrganizationData } from "@/lib/IOrganizationData";
 import { toast } from "@/hooks/useToast";
@@ -75,25 +76,12 @@ export default function OrganizationProvider({
   }, [classes, organization]);
 
   const fetchOrganization = useCallback(async () => {
+    if (!user) return null;
     try {
-      const { data, error } = await supabase
-        .from("organizations")
-        .select(
-          "organization_uid, name, description, contact_email, phone_number, address, website"
-        )
-        .eq("admin_uid", user.id)
-        .single();
-
-      if (error) throw error;
-      setOrganization({
-        organization_uid: data.organization_uid,
-        name: data.name,
-        description: data.description,
-        contactEmail: data.contact_email,
-        phone: data.phone_number,
-        address: data.address,
-        website: data.website,
-      });
+      const res = await fetch("/api/organizations");
+      if (!res.ok) throw new Error("Failed to fetch organization");
+      const data = await res.json();
+      setOrganization(data);
       return data;
     } catch (error) {
       console.error("Error fetching organization:", error);
@@ -108,43 +96,31 @@ export default function OrganizationProvider({
     phone,
     address,
     website,
-  }: {
-    name: string;
-    description: string;
-    contactEmail: string;
-    phone: string;
-    address: string;
-    website: string;
-  }) {
-    const organizationUid = crypto.randomUUID();
-    const { error: organizationError } = await supabase
-      .from("organizations")
-      .insert({
-        organization_uid: organizationUid,
-        admin_uid: user.id,
-        name: name,
-        description: description,
-        contact_email: contactEmail,
-        phone_number: phone,
-        address: address,
-        website: website,
+  }: IUpdateOrganizationData) {
+    try {
+      const res = await fetch("/api/organizations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description, contactEmail, phone, address, website }),
       });
 
-    if (organizationError) {
-      console.error("Error creating organization:", organizationError);
+      if (!res.ok) throw new Error("Failed to create organization");
+
+      const data = await res.json();
+      setOrganization({
+        organization_uid: data.organization_uid,
+        name: data.name,
+        description: data.description,
+        contactEmail: data.contactEmail,
+        phone: data.phone,
+        address: data.address,
+        website: data.website,
+      });
+      return true;
+    } catch (error) {
+      console.error("Error creating organization:", error);
       return false;
     }
-
-    setOrganization({
-      organization_uid: organizationUid,
-      name: name,
-      description: description,
-      contactEmail: contactEmail,
-      phone: phone,
-      address: address,
-      website: website,
-    });
-    return true;
   }
 
   async function updateOrganization({
@@ -154,28 +130,24 @@ export default function OrganizationProvider({
     phone,
     address,
     website,
-  }: {
-    name: string;
-    description: string;
-    contactEmail: string;
-    phone: string;
-    address: string;
-    website: string;
-  }) {
+  }: IUpdateOrganizationData) {
     if (!organization) return false;
     try {
-      const { error: organizationError } = await supabase
-        .from("organizations")
-        .update({
-          name: name,
-          description: description,
-          contact_email: contactEmail,
-          phone_number: phone,
-          address: address,
-          website: website,
-        })
-        .eq("organization_uid", organization.organization_uid);
-      if (organizationError) {
+      const res = await fetch("/api/organizations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          organization_uid: organization.organization_uid,
+          name,
+          description,
+          contactEmail,
+          phone,
+          address,
+          website,
+        }),
+      });
+
+      if (!res.ok) {
         toast({
           title: "Error",
           description: "Failed to update organization.",
@@ -186,12 +158,12 @@ export default function OrganizationProvider({
 
       setOrganization({
         organization_uid: organization.organization_uid,
-        name: name,
-        description: description,
-        contactEmail: contactEmail,
-        phone: phone,
-        address: address,
-        website: website,
+        name,
+        description,
+        contactEmail,
+        phone,
+        address,
+        website,
       });
       toast({
         title: "Success",

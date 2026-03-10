@@ -1,0 +1,23 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/attendance/route": "app/api/attendance/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/api/bookings/[id]/route": "app/api/bookings/[id]/route.js",
+  "/api/bookings/route": "app/api/bookings/route.js",
+  "/api/classes/[id]/route": "app/api/classes/[id]/route.js",
+  "/api/classes/route": "app/api/classes/route.js",
+  "/api/instructors/route": "app/api/instructors/route.js",
+  "/api/packages/[id]/route": "app/api/packages/[id]/route.js",
+  "/api/organizations/route": "app/api/organizations/route.js",
+  "/api/packages/route": "app/api/packages/route.js",
+  "/api/profiles/route": "app/api/profiles/route.js",
+  "/api/register/route": "app/api/register/route.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/(protected)/dashboard/page": "app/(protected)/dashboard/page.js",
+  "/(protected)/home/page": "app/(protected)/home/page.js",
+  "/(protected)/organization-classes/page": "app/(protected)/organization-classes/page.js",
+  "/(protected)/create-organization/page": "app/(protected)/create-organization/page.js",
+  "/(protected)/organization-settings/page": "app/(protected)/organization-settings/page.js",
+  "/(protected)/profile/page": "app/(protected)/profile/page.js"
+}

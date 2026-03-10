@@ -1,5 +1,6 @@
+"use client";
+
 import React, { createContext, useCallback, useContext, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/useToast";
 import { IClassData } from "@/lib/IClassData";
 import { useAuthContext } from "./AuthProvider";
@@ -34,61 +35,10 @@ export default function ClassesProvider({
 
   const fetchClasses = useCallback(async () => {
     try {
-      const [
-        { data: classesData, error },
-        { data: bookingsData },
-        { data: instructorsData },
-        { data: orgsData },
-      ] = await Promise.all([
-        supabase
-          .from("classes")
-          .select(
-            "id, title, class_time, class_date, max_capacity, instructor_uid, organization_uid"
-          ),
-        supabase
-          .from("bookings")
-          .select("class_id")
-          .eq("booking_status", "confirmed"),
-        supabase
-          .from("organization_instructors")
-          .select("instructor_uid, name"),
-        supabase
-          .from("organizations")
-          .select("organization_uid, name"),
-      ]);
-
-      if (error || !classesData) {
-        toast({
-          title: "Error",
-          description: "Failed to load classes.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const countMap: Record<string, number> = {};
-      bookingsData?.forEach((b) => {
-        countMap[b.class_id] = (countMap[b.class_id] || 0) + 1;
-      });
-
-      const instructorMap: Record<string, string> = {};
-      instructorsData?.forEach((i) => {
-        instructorMap[i.instructor_uid] = i.name;
-      });
-
-      const orgMap: Record<string, string> = {};
-      orgsData?.forEach((o) => {
-        orgMap[o.organization_uid] = o.name;
-      });
-
-      setClasses(
-        classesData.map((c) => ({
-          ...c,
-          current_bookings: countMap[c.id] || 0,
-          instructor_name: instructorMap[c.instructor_uid],
-          organization_name: orgMap[c.organization_uid],
-        }))
-      );
+      const res = await fetch("/api/classes");
+      if (!res.ok) throw new Error("Failed to fetch classes");
+      const data = await res.json();
+      setClasses(data);
     } catch (error) {
       console.error("Error fetching classes:", error);
       toast({
@@ -116,18 +66,22 @@ export default function ClassesProvider({
       return false;
     }
 
-    const classId = crypto.randomUUID();
-    const { error } = await supabase.from("classes").insert({
-      id: classId,
-      organization_uid,
-      class_date,
-      class_time,
-      instructor_uid,
-      max_capacity,
-      title,
-    });
+    try {
+      const res = await fetch("/api/classes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, class_time, class_date, max_capacity, instructor_uid, organization_uid }),
+      });
 
-    if (error) {
+      if (!res.ok) throw new Error("Failed to create class");
+
+      const created = await res.json();
+      setClasses((prev) => [
+        ...(prev || []),
+        { ...created, current_bookings: 0 },
+      ]);
+      return true;
+    } catch {
       toast({
         title: "Error",
         description: "Failed to create class.",
@@ -135,36 +89,23 @@ export default function ClassesProvider({
       });
       return false;
     }
-
-    setClasses((prev) => [
-      ...(prev || []),
-      {
-        id: classId,
-        organization_uid,
-        title,
-        class_time,
-        class_date,
-        max_capacity,
-        instructor_uid,
-        current_bookings: 0,
-      },
-    ]);
-    return true;
   }
 
   async function updateClass(data: IClassData): Promise<boolean> {
-    const { error } = await supabase
-      .from("classes")
-      .update({
-        title: data.title,
-        class_time: data.class_time,
-        class_date: data.class_date,
-        max_capacity: data.max_capacity,
-        instructor_uid: data.instructor_uid,
-      })
-      .eq("id", data.id);
+    try {
+      const res = await fetch(`/api/classes/${data.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (error) {
+      if (!res.ok) throw new Error("Failed to update class");
+
+      setClasses((prev) =>
+        prev?.map((c) => (c.id === data.id ? { ...c, ...data } : c)) || null
+      );
+      return true;
+    } catch {
       toast({
         title: "Error",
         description: "Failed to update class.",
@@ -172,11 +113,6 @@ export default function ClassesProvider({
       });
       return false;
     }
-
-    setClasses((prev) =>
-      prev?.map((c) => (c.id === data.id ? { ...c, ...data } : c)) || null
-    );
-    return true;
   }
 
   async function bookClass(classId: string): Promise<boolean> {
@@ -201,29 +137,35 @@ export default function ClassesProvider({
       return false;
     }
 
-    const { data: existing } = await supabase
-      .from("bookings")
-      .select("id")
-      .eq("class_id", classId)
-      .eq("user_id", user.id)
-      .eq("booking_status", "confirmed")
-      .maybeSingle();
-
-    if (existing) {
-      toast({
-        title: "Already booked",
-        description: "You've already booked this class.",
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ class_id: classId }),
       });
-      return false;
-    }
 
-    const { error } = await supabase.from("bookings").insert({
-      class_id: classId,
-      user_id: user.id,
-      booking_status: "confirmed",
-    });
+      if (res.status === 409) {
+        toast({ title: "Already booked", description: "You've already booked this class." });
+        return false;
+      }
 
-    if (error) {
+      if (!res.ok) throw new Error("Failed to book class");
+
+      setClasses(
+        (prev) =>
+          prev?.map((c) =>
+            c.id === classId
+              ? { ...c, current_bookings: c.current_bookings + 1 }
+              : c
+          ) || null
+      );
+
+      toast({
+        title: "Booked!",
+        description: `You've successfully booked ${classItem.title}.`,
+      });
+      return true;
+    } catch {
       toast({
         title: "Error",
         description: "Failed to book class.",
@@ -231,30 +173,16 @@ export default function ClassesProvider({
       });
       return false;
     }
-
-    setClasses(
-      (prev) =>
-        prev?.map((c) =>
-          c.id === classId
-            ? { ...c, current_bookings: c.current_bookings + 1 }
-            : c
-        ) || null
-    );
-
-    toast({
-      title: "Booked!",
-      description: `You've successfully booked ${classItem.title}.`,
-    });
-    return true;
   }
 
   async function deleteClass(classId: string): Promise<boolean> {
-    const { error } = await supabase
-      .from("classes")
-      .delete()
-      .eq("id", classId);
+    try {
+      const res = await fetch(`/api/classes/${classId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete class");
 
-    if (error) {
+      setClasses((prev) => prev?.filter((c) => c.id !== classId) || null);
+      return true;
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete class.",
@@ -262,9 +190,6 @@ export default function ClassesProvider({
       });
       return false;
     }
-
-    setClasses((prev) => prev?.filter((c) => c.id !== classId) || null);
-    return true;
   }
 
   return (
