@@ -9,7 +9,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const { booking_status } = await req.json();
+
+  const [booking] = await db
+    .select({ user_id: bookings.user_id })
+    .from(bookings)
+    .where(eq(bookings.id, id));
+
+  if (!booking) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (booking.user_id !== session.user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  let booking_status;
+  try {
+    ({ booking_status } = await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
   await db
     .update(bookings)

@@ -36,9 +36,13 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { class_id } = await req.json();
+  let class_id;
+  try {
+    ({ class_id } = await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
-  // Check for existing booking
   const existing = await db
     .select()
     .from(bookings)

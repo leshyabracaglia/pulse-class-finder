@@ -20,7 +20,12 @@ export async function PUT(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { full_name } = await req.json();
+  let full_name;
+  try {
+    ({ full_name } = await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
   await db
     .update(profiles)

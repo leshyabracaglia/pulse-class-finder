@@ -12,6 +12,31 @@ dist
 dist-ssr
 *.local
 
+# Next.js
+.next/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

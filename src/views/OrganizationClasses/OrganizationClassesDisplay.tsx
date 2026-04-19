@@ -39,6 +39,7 @@ function AddEditClassForm({
     class_date: editingClass?.class_date || "",
     max_capacity: editingClass?.max_capacity || 0,
     current_bookings: editingClass?.current_bookings || 0,
+    image_url: editingClass?.image_url || null,
   });
 
   useEffect(() => {
@@ -51,6 +52,7 @@ function AddEditClassForm({
       class_date: editingClass?.class_date || "",
       max_capacity: editingClass?.max_capacity || 0,
       current_bookings: editingClass?.current_bookings || 0,
+      image_url: editingClass?.image_url || null,
     });
   }, [editingClass]);
 
@@ -161,6 +163,18 @@ function AddEditClassForm({
               min="1"
               max="100"
               required
+            />
+          </div>
+          <div className="md:col-span-2">
+            <Label htmlFor="imageUrl">Class Image URL (optional)</Label>
+            <Input
+              id="imageUrl"
+              type="url"
+              value={classData.image_url || ""}
+              onChange={(e) =>
+                setClassData({ ...classData, image_url: e.target.value || null })
+              }
+              placeholder="https://example.com/class-image.jpg"
             />
           </div>
           <div className="md:col-span-2 flex gap-2">

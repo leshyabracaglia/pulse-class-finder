@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import ClassDetailDialog from "./ClassDetailDialog";
 import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
@@ -20,59 +21,74 @@ import { IClassData } from "@/lib/IClassData";
 function ClassCard({ classItem }: { classItem: IClassData }) {
   const { organization } = useOrganizationContext();
   const { bookClass } = useClassesContext();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const isCompanyAdmin = !!organization;
   const isFull = classItem.current_bookings >= classItem.max_capacity;
 
   const handleBook = async () => {
     await bookClass(classItem.id);
+    setDialogOpen(false);
   };
 
   return (
-    <Card key={classItem.id} className="hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-xl">{classItem.title}</CardTitle>
-            <CardDescription>
-              with {classItem.instructor_name || classItem.instructor_uid}
-            </CardDescription>
-            {classItem.organization_name && (
-              <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                <Building className="w-3 h-3" />
-                {classItem.organization_name}
-              </p>
-            )}
+    <>
+      <Card
+        key={classItem.id}
+        className="hover:shadow-lg transition-shadow cursor-pointer"
+        onClick={() => setDialogOpen(true)}
+      >
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-xl">{classItem.title}</CardTitle>
+              <CardDescription>
+                with {classItem.instructor_name || classItem.instructor_uid}
+              </CardDescription>
+              {classItem.organization_name && (
+                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                  <Building className="w-3 h-3" />
+                  {classItem.organization_name}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3 mb-4">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Calendar className="w-4 h-4" />
-            <span className="text-sm">{formatDate(classItem.class_date)}</span>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3 mb-4">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Calendar className="w-4 h-4" />
+              <span className="text-sm">{formatDate(classItem.class_date)}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm">{formatTime(classItem.class_time)}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <Users className="w-4 h-4" />
+              <span className="text-sm">
+                {classItem.current_bookings}/{classItem.max_capacity} spots filled
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm">{formatTime(classItem.class_time)}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Users className="w-4 h-4" />
-            <span className="text-sm">
-              {classItem.current_bookings}/{classItem.max_capacity} spots filled
-            </span>
-          </div>
-        </div>
 
-        <Button
-          className="w-full"
-          onClick={handleBook}
-          disabled={isCompanyAdmin || isFull}
-        >
-          {isFull ? "Class Full" : "Book Class"}
-        </Button>
-      </CardContent>
-    </Card>
+          <Button
+            className="w-full"
+            onClick={(e) => { e.stopPropagation(); bookClass(classItem.id); }}
+            disabled={isCompanyAdmin || isFull}
+          >
+            {isFull ? "Class Full" : "Book Class"}
+          </Button>
+        </CardContent>
+      </Card>
+      <ClassDetailDialog
+        classItem={classItem}
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onBook={handleBook}
+        isCompanyAdmin={isCompanyAdmin}
+      />
+    </>
   );
 }
 

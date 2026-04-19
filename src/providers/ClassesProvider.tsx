@@ -2,8 +2,15 @@
 
 import React, { createContext, useCallback, useContext, useState } from "react";
 import { toast } from "@/hooks/useToast";
+import { writeContract, waitForTransactionReceipt, getAccount } from "@wagmi/core";
 import { IClassData } from "@/lib/IClassData";
 import { useAuthContext } from "./AuthProvider";
+import { wagmiConfig } from "@/lib/wagmi";
+import {
+  BOOKING_CONTRACT_ADDRESS,
+  PULSE_BOOKING_ABI,
+  classIdToBytes32,
+} from "@/lib/contracts";
 
 interface ICreateClassData {
   title: string;
@@ -12,6 +19,7 @@ interface ICreateClassData {
   max_capacity: number;
   instructor_uid: string;
   organization_uid: string;
+  image_url?: string | null;
 }
 
 interface IClassesContext {
@@ -56,6 +64,7 @@ export default function ClassesProvider({
     max_capacity,
     instructor_uid,
     organization_uid,
+    image_url,
   }: ICreateClassData) {
     if (!organization_uid) {
       toast({
@@ -70,12 +79,33 @@ export default function ClassesProvider({
       const res = await fetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, class_time, class_date, max_capacity, instructor_uid, organization_uid }),
+        body: JSON.stringify({ title, class_time, class_date, max_capacity, instructor_uid, organization_uid, image_url: image_url || null }),
       });
 
       if (!res.ok) throw new Error("Failed to create class");
 
       const created = await res.json();
+
+      // Register the class on-chain (best-effort — doesn't block if wallet not connected)
+      if (BOOKING_CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000") {
+        const { address, chain } = getAccount(wagmiConfig);
+        if (address && chain) {
+          try {
+            const hash = await writeContract(wagmiConfig, {
+              address: BOOKING_CONTRACT_ADDRESS,
+              abi: PULSE_BOOKING_ABI,
+              functionName: "registerClass",
+              args: [classIdToBytes32(created.id), BigInt(max_capacity)],
+              account: address,
+              chain,
+            });
+            await waitForTransactionReceipt(wagmiConfig, { hash });
+          } catch (e) {
+            console.warn("On-chain registerClass failed:", e);
+          }
+        }
+      }
+
       setClasses((prev) => [
         ...(prev || []),
         { ...created, current_bookings: 0 },
@@ -138,6 +168,23 @@ export default function ClassesProvider({
     }
 
     try {
+      // If the booking contract is deployed, record the booking on-chain first
+      if (BOOKING_CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000") {
+        const { address, chain } = getAccount(wagmiConfig);
+        if (address && chain) {
+          const hash = await writeContract(wagmiConfig, {
+            address: BOOKING_CONTRACT_ADDRESS,
+            abi: PULSE_BOOKING_ABI,
+            functionName: "bookClass",
+            args: [classIdToBytes32(classId)],
+            account: address,
+            chain,
+          });
+          await waitForTransactionReceipt(wagmiConfig, { hash });
+        }
+      }
+
+      // Also record in Postgres so attendance views keep working
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

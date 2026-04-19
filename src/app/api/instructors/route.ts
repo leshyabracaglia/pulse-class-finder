@@ -27,16 +27,23 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { organization_uid, name, email, phone_number } = await req.json();
-  const instructor_uid = crypto.randomUUID();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { organization_uid, name, email, phone_number, photo_url } = body;
 
+  const instructor_uid = crypto.randomUUID();
   await db.insert(organization_instructors).values({
     instructor_uid,
     organization_uid,
     name,
     email,
     phone_number,
+    photo_url: photo_url || null,
   });
 
-  return NextResponse.json({ instructor_uid, organization_uid, name, email, phone_number });
+  return NextResponse.json({ instructor_uid, organization_uid, name, email, phone_number, photo_url: photo_url || null });
 }

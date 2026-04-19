@@ -5,7 +5,13 @@ import { profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
-  const { email, password, fullName } = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { email, password, fullName } = body;
 
   if (!email || !password) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });

@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { Button } from "@/components/ui/legacy/button";
+import { formatPrice } from "@/lib/utils";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/legacy/card";
@@ -77,17 +76,12 @@ const UserPackages = () => {
     return "active";
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString([], {
+  const formatDateShort = (dateString: string) =>
+    new Date(dateString).toLocaleDateString([], {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-  };
-
-  const formatPrice = (cents: number) => {
-    return (cents / 100).toFixed(2);
-  };
 
   if (loading) {
     return <div className="text-center py-4">Loading your packages...</div>;
@@ -180,14 +174,14 @@ const UserPackages = () => {
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4" />
                           <span>
-                            Expires {formatDate(userPackage.expires_at)}
+                            Expires {formatDateShort(userPackage.expires_at)}
                           </span>
                         </div>
                       )}
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
                       <span>
-                        Purchased {formatDate(userPackage.purchased_at)}
+                        Purchased {formatDateShort(userPackage.purchased_at)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

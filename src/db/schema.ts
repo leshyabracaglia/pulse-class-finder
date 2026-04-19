@@ -11,6 +11,7 @@ export const profiles = pgTable("profiles", {
   email: text("email").notNull(),
   full_name: text("full_name"),
   password_hash: text("password_hash"),
+  wallet_address: text("wallet_address").unique(),
   created_at: timestamp("created_at").defaultNow(),
   updated_at: timestamp("updated_at").defaultNow(),
 });
@@ -19,6 +20,7 @@ export const organizations = pgTable("organizations", {
   organization_uid: text("organization_uid").primaryKey(),
   admin_uid: text("admin_uid").notNull(),
   name: text("name").notNull(),
+  wallet_address: text("wallet_address"),
   description: text("description"),
   contact_email: text("contact_email"),
   phone_number: text("phone_number"),
@@ -33,6 +35,7 @@ export const organization_instructors = pgTable("organization_instructors", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone_number: text("phone_number").notNull(),
+  photo_url: text("photo_url"),
 });
 
 export const classes = pgTable("classes", {
@@ -43,6 +46,7 @@ export const classes = pgTable("classes", {
   class_date: text("class_date").notNull(),
   class_time: text("class_time").notNull(),
   max_capacity: integer("max_capacity").notNull(),
+  image_url: text("image_url"),
   created_at: timestamp("created_at").defaultNow(),
 });
 

@@ -18,4 +18,6 @@ export interface IClassData {
   current_bookings: number;
   instructor_name?: string;
   organization_name?: string;
+  image_url?: string | null;
+  instructor_photo_url?: string | null;
 }

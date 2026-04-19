@@ -1,13 +1,16 @@
 import { NextAuthOptions, getServerSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { SiweMessage } from "siwe";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    // Email + password (kept for dev seeds)
     Credentials({
+      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -36,6 +39,41 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    // Wallet-based sign-in via SIWE
+    Credentials({
+      id: "siwe",
+      name: "Ethereum",
+      credentials: {
+        message: { label: "Message", type: "text" },
+        signature: { label: "Signature", type: "text" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.message || !credentials?.signature) return null;
+        try {
+          const siwe = new SiweMessage(JSON.parse(credentials.message));
+          const result = await siwe.verify({ signature: credentials.signature });
+          if (!result.success) return null;
+
+          const walletAddress = siwe.address.toLowerCase();
+          const [profile] = await db
+            .select()
+            .from(profiles)
+            .where(eq(profiles.wallet_address, walletAddress));
+
+          if (profile) {
+            return { id: profile.id, email: profile.email, name: profile.full_name };
+          }
+
+          // First-time wallet sign-in: create a new profile
+          const id = crypto.randomUUID();
+          const email = `${walletAddress}@wallet.eth`;
+          await db.insert(profiles).values({ id, email, wallet_address: walletAddress });
+          return { id, email, name: null };
+        } catch {
+          return null;
+        }
+      },
+    }),
   ],
   callbacks: {
     jwt({ token, user }) {
@@ -46,7 +84,7 @@ export const authOptions: NextAuthOptions = {
     },
     session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id as string;
+        session.user.id = token.id as string;
       }
       return session;
     },

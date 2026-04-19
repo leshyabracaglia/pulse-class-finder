@@ -27,10 +27,16 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { organization_uid, name, description, package_type, class_count, duration_days, price_cents, is_active } = body;
+
   const id = crypto.randomUUID();
+  await db.insert(packages).values({ id, organization_uid, name, description, package_type, class_count, duration_days, price_cents, is_active });
 
-  await db.insert(packages).values({ id, ...body });
-
-  return NextResponse.json({ id, ...body });
+  return NextResponse.json({ id, organization_uid, name, description, package_type, class_count, duration_days, price_cents, is_active });
 }

@@ -9,9 +9,7 @@ import {
 } from "@/components/ui/legacy/dropdown-menu";
 import { Plus, User } from "lucide-react";
 import { Label } from "@/components/ui/legacy/label";
-import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/useToast";
-import { useOrganizationContext } from "@/providers/OrganizationProvider";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,74 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/legacy/dialog";
 import { Input } from "@/components/ui/Input";
-
-interface IInstructorData {
-  instructor_uid: string;
-  organization_uid: string;
-  name: string;
-  email: string;
-  phone_number: string;
-}
-
-function useOrganizationInstructors() {
-  const { organization } = useOrganizationContext();
-  const { toast } = useToast();
-
-  const [organizationInstructors, setOrganizationInstructors] =
-    useState<IInstructorData[]>();
-
-  const fetchInstructors = async () => {
-    if (!organization) return;
-    try {
-      const res = await fetch(
-        `/api/instructors?organization_uid=${organization.organization_uid}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch instructors");
-      const data = await res.json();
-      setOrganizationInstructors(data || []);
-    } catch (error) {
-      console.error("Error fetching instructors:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load instructors.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const createInstructor = async (instructorData: IInstructorData) => {
-    if (!organization || organizationInstructors === undefined) return;
-
-    try {
-      const res = await fetch("/api/instructors", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          organization_uid: organization.organization_uid,
-          name: instructorData.name,
-          email: instructorData.email,
-          phone_number: instructorData.phone_number,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to create instructor");
-      const created = await res.json();
-      setOrganizationInstructors([...organizationInstructors, created]);
-      toast({
-        title: "Success",
-        description: "Instructor created successfully.",
-      });
-    } catch (error) {
-      console.error("Error creating instructor:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create instructor.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  return { organizationInstructors, fetchInstructors, createInstructor };
-}
+import { useOrganizationInstructors, IInstructorData } from "@/hooks/useOrganizationInstructors";
 
 function AddInstructorModal({
   open,
@@ -102,6 +33,7 @@ function AddInstructorModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone_number, setPhoneNumber] = useState("");
+  const [photo_url, setPhotoUrl] = useState("");
 
   const handleSubmitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -112,6 +44,7 @@ function AddInstructorModal({
       name,
       email,
       phone_number,
+      photo_url: photo_url || null,
     });
   };
 
@@ -148,6 +81,14 @@ function AddInstructorModal({
             label="Phone Number"
             required
           />
+          <Input
+            id="photo_url"
+            value={photo_url}
+            onChange={(e) => setPhotoUrl(e.target.value)}
+            type="url"
+            label="Photo URL (optional)"
+            placeholder="https://example.com/photo.jpg"
+          />
           <DialogFooter>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
             <Button type="submit" disabled={!name || !email || !phone_number}>
@@ -167,22 +108,15 @@ export default function InstructorSelector({
   instructorUid: string;
   updateInstructorUid: (instructorUid: string) => void;
 }) {
-  const { organizationInstructors, fetchInstructors, createInstructor } =
-    useOrganizationInstructors();
-
+  const { instructors, createInstructor } = useOrganizationInstructors();
   const [addInstructorModalOpen, setAddInstructorModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (organizationInstructors !== undefined) return;
-    fetchInstructors();
-  }, [fetchInstructors, organizationInstructors]);
 
   const handleSubmit = (instructorData: IInstructorData) => {
     createInstructor(instructorData);
     setAddInstructorModalOpen(false);
   };
 
-  if (organizationInstructors === undefined) return <div>Loading...</div>;
+  if (instructors === undefined) return <div>Loading...</div>;
 
   return (
     <>
@@ -196,7 +130,7 @@ export default function InstructorSelector({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {organizationInstructors.length === 0 && (
+            {instructors.length === 0 && (
               <DropdownMenuItem>
                 <User className="w-4 h-4" />
                 No instructors found, add one
@@ -206,7 +140,7 @@ export default function InstructorSelector({
                 </Button>
               </DropdownMenuItem>
             )}
-            {organizationInstructors.map((instructor) => (
+            {instructors.map((instructor) => (
               <DropdownMenuItem
                 key={instructor.instructor_uid}
                 onClick={() => updateInstructorUid(instructor.instructor_uid)}
