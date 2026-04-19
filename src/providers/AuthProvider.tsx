@@ -1,23 +1,26 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, Session, AuthError } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { ROUTES } from "@/routes";
+"use client";
+
+import React, { createContext, useContext } from "react";
+import { useSession, signIn as nextAuthSignIn, signOut as nextAuthSignOut } from "next-auth/react";
+import { ROUTES } from "@/lib/routes";
+
+interface IUser {
+  id: string;
+  email?: string | null;
+  name?: string | null;
+}
 
 interface IAuthContext {
-  user: User | null;
-  session: Session | null;
+  user: IUser | null;
   signUp: (
     email: string,
     password: string,
     fullName: string
-  ) => Promise<{
-    data: { user: User | null; session: Session | null };
-    error: AuthError | null;
-  }>;
+  ) => Promise<{ error: { message: string } | null }>;
   signIn: (
     email: string,
     password: string
-  ) => Promise<{ error: AuthError | null }>;
+  ) => Promise<{ error: { message: string } | null }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -37,88 +40,56 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
+  const user: IUser | null = session?.user
+    ? {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
       }
-      setLoading(false);
-    };
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    // Set up auth state listener
-    if (!user?.id) return;
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_OUT" && session?.user) {
-        setUser(null);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [user]);
+    : null;
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, fullName }),
+      });
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
-    // setUser(data?.user);
-    // setSession(data?.session);
-    return { data, error };
+      if (!res.ok) {
+        const data = await res.json();
+        return { error: { message: data.error || "Registration failed" } };
+      }
+
+      return { error: null };
+    } catch {
+      return { error: { message: "An unexpected error occurred" } };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const result = await nextAuthSignIn("credentials", {
       email,
       password,
+      redirect: false,
     });
-    return { error };
+
+    if (result?.error) {
+      return { error: { message: "Invalid email or password" } };
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut({ scope: "local" });
-
-      if (
-        error &&
-        !error.message
-          .toLowerCase()
-          .includes("session from session_id claim in jwt does not exist")
-      ) {
-        console.error("Supabase signOut error:", error);
-      }
-    } catch (e) {
-      // Network or unexpected errors shouldn't block clearing local auth state.
-      console.error("Unexpected signOut error:", e);
-    } finally {
-      setSession(null);
-
-      window.location.href = ROUTES.AUTH;
-    }
+    await nextAuthSignOut({ callbackUrl: ROUTES.AUTH });
   };
 
   const value = {
     user,
-    session,
     signUp,
     signIn,
     signOut,

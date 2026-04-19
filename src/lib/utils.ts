@@ -20,3 +20,5 @@ export const formatDate = (date: string) => {
     day: "numeric",
   });
 };
+
+export const formatPrice = (cents: number) => (cents / 100).toFixed(2);

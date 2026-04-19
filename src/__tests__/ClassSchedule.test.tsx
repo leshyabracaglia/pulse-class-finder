@@ -1,13 +1,13 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
-import ClassSchedule from "@/pages/Classes/ClassSchedule";
+import ClassSchedule from "@/views/Classes/ClassSchedule";
 import { useClassesContext } from "@/providers/ClassesProvider";
 import { useOrganizationContext } from "@/providers/OrganizationProvider";
 
 vi.mock("@/providers/ClassesProvider", () => ({ useClassesContext: vi.fn() }));
 vi.mock("@/providers/OrganizationProvider", () => ({ useOrganizationContext: vi.fn() }));
-vi.mock("@/pages/Classes/useUserLocation", () => ({
+vi.mock("@/views/Classes/useUserLocation", () => ({
   default: () => ({
     location: { loading: false, latitude: null, error: null },
     requestLocation: vi.fn(),

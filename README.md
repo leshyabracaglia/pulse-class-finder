@@ -1,73 +1,131 @@
-# Welcome to your Lovable project
+# Pulse Class Finder
 
-## Project info
+A modern class booking and management platform for fitness studios and wellness organizations. Built with Next.js 15, featuring both traditional and Web3 authentication options.
 
-**URL**: https://lovable.dev/projects/6af0245b-e513-483f-bb21-484cd7fc4c77
+## Features
 
-## How can I edit this code?
+- **Class Scheduling** — Browse, filter, and book fitness/wellness classes
+- **Organization Management** — Create organizations, manage instructors, and configure settings
+- **Booking System** — Real-time capacity tracking with attendance management
+- **Package System** — Sell class packages with Stripe integration
+- **Web3 Integration** — Optional on-chain booking via smart contracts (RainbowKit + SIWE)
+- **User Profiles** — Track booking history and manage account settings
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Framework:** Next.js 15 (App Router)
+- **Database:** Vercel Postgres + Drizzle ORM
+- **Auth:** NextAuth v4 (credentials + wallet-based SIWE)
+- **Styling:** Tailwind CSS + shadcn/ui
+- **State:** React Query + React Context
+- **Web3:** wagmi, viem, RainbowKit
+- **Payments:** Stripe (optional)
+- **Testing:** Vitest + React Testing Library
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6af0245b-e513-483f-bb21-484cd7fc4c77) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+
+- A Vercel Postgres database (or compatible PostgreSQL)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# Clone the repository
+git clone <repo-url>
+cd pulse-class-finder
 
-Follow these steps:
+# Install dependencies
+npm install
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Copy environment variables
+cp .env.local.example .env.local
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Environment Variables
 
-# Step 3: Install the necessary dependencies.
-npm i
+Edit `.env.local` with your values:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+# Vercel Postgres connection string
+POSTGRES_URL=
+
+# NextAuth (generate secret with: openssl rand -base64 32)
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+
+# Stripe (optional)
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+```
+
+### Database Setup
+
+Push the schema to your database:
+
+```bash
+npm run db:push
+```
+
+Optionally seed with sample data:
+
+```bash
+npm run db:seed
+```
+
+### Development
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Scripts
 
-**Use GitHub Codespaces**
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run tests in watch mode |
+| `npm run test:run` | Run tests once (CI) |
+| `npm run db:push` | Push Drizzle schema to database |
+| `npm run db:studio` | Open Drizzle Studio |
+| `npm run db:seed` | Seed database with sample data |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── (protected)/        # Auth-required routes
+│   │   ├── home/           # Class browser
+│   │   ├── profile/        # User profile
+│   │   ├── dashboard/      # User dashboard
+│   │   ├── organization-*/  # Org management
+│   │   └── create-organization/
+│   ├── api/                # API routes
+│   └── login/              # Public auth page
+├── components/ui/          # shadcn/ui components
+├── db/                     # Drizzle schema & client
+├── lib/                    # Utilities, auth config, contracts
+├── providers/              # React context providers
+└── views/                  # Page-level components
+```
 
-This project is built with:
+## Database Schema
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **profiles** — User accounts (email, password, wallet address)
+- **organizations** — Studios/gyms with admin ownership
+- **organization_instructors** — Instructors per organization
+- **classes** — Scheduled classes with capacity
+- **bookings** — User class reservations
+- **packages** — Purchasable class bundles
+- **user_packages** — Purchased packages per user
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/6af0245b-e513-483f-bb21-484cd7fc4c77) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+MIT

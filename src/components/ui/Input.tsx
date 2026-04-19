@@ -33,9 +33,10 @@ export function Input({
   step,
   pattern,
   disabled,
+  className,
 }: {
   label?: string;
-  id: string;
+  id?: string;
   type?:
     | "text"
     | "email"
@@ -46,14 +47,15 @@ export function Input({
     | "date"
     | "time";
   placeholder?: string;
-  value: string | number;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value?: string | number;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   min?: string | number;
   max?: string | number;
   step?: string | number;
   pattern?: string;
   disabled?: boolean;
+  className?: string;
 }) {
   return (
     <div className="space-y-2">
@@ -70,6 +72,7 @@ export function Input({
         step={step}
         pattern={pattern}
         disabled={disabled}
+        className={className}
       />
     </div>
   );
