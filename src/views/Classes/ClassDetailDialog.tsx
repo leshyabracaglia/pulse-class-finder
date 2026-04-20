@@ -79,7 +79,11 @@ export default function ClassDetailDialog({
             {classItem.instructor_photo_url ? (
               <img
                 src={classItem.instructor_photo_url}
-                alt={classItem.instructor_name || "Instructor"}
+                alt={
+                  typeof classItem.instructor_name === "string"
+                    ? classItem.instructor_name
+                    : "Instructor"
+                }
                 className="w-10 h-10 rounded-full object-cover"
               />
             ) : (
@@ -88,7 +92,9 @@ export default function ClassDetailDialog({
               </div>
             )}
             <span className="text-sm text-gray-700">
-              {classItem.instructor_name || classItem.instructor_uid}
+              {typeof classItem.instructor_name === "object"
+                ? (classItem.instructor_name as { name?: string })?.name
+                : classItem.instructor_name || classItem.instructor_uid}
             </span>
           </div>
 

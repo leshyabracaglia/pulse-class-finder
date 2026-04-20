@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/useToast";
 
 export interface LocationState {
@@ -49,50 +49,51 @@ export default function useUserLocation() {
 
     setLocation((prev) => ({ ...prev, loading: true, error: null }));
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          loading: false,
-          error: null,
-        });
-        toast({
-          title: "Location found",
-          description: "Now showing distances to classes!",
-        });
-      },
-      (error) => {
-        let errorMessage = "Unable to get your location.";
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage =
-              "Location access denied. Please enable location permissions.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Location request timed out.";
-            break;
-        }
-        setLocation((prev) => ({
-          ...prev,
-          loading: false,
-          error: errorMessage,
-        }));
-        toast({
-          title: "Location Error",
-          description: errorMessage,
-          variant: "destructive",
-        });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 600000, // 10 minutes
+    const onSuccess = (position: GeolocationPosition) => {
+      setLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        loading: false,
+        error: null,
+      });
+      toast({
+        title: "Location found",
+        description: "Now showing distances to classes!",
+      });
+    };
+
+    const onError = (error: GeolocationPositionError) => {
+      let errorMessage = "Unable to get your location.";
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage =
+            "Location access denied. Please enable location permissions.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = "Location information unavailable.";
+          break;
+        case error.TIMEOUT:
+          errorMessage = "Location request timed out. Please try again.";
+          break;
       }
-    );
+      setLocation((prev) => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+      }));
+      toast({
+        title: "Location Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    };
+
+    // Use low accuracy first (faster, network-based) with longer timeout
+    navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+      enableHighAccuracy: false,
+      timeout: 30000,
+      maximumAge: 600000, // 10 minutes
+    });
   };
 
   return { location, requestLocation };

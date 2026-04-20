@@ -45,7 +45,8 @@ export async function GET() {
   const result = classesData.map((c) => ({
     ...c,
     current_bookings: countMap[c.id] || 0,
-    instructor_name: instructorMap[c.instructor_uid],
+    instructor_name: instructorMap[c.instructor_uid]?.name,
+    instructor_photo_url: instructorMap[c.instructor_uid]?.photo_url,
     organization_name: orgMap[c.organization_uid],
   }));
 

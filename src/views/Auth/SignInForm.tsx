@@ -83,19 +83,29 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
         chainId: chain.id,
         nonce,
       });
-      const signature = await signMessageAsync({ message: message.prepareMessage(), account: address });
+      const signature = await signMessageAsync({
+        message: message.prepareMessage(),
+        account: address,
+      });
       const result = await signIn("siwe", {
         message: JSON.stringify(message),
         signature,
         redirect: false,
       });
       if (result?.error) {
-        toast({ title: "Error", description: "Wallet sign-in failed.", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Wallet sign-in failed.",
+          variant: "destructive",
+        });
       } else {
         router.push(ROUTES.HOME);
       }
     } catch {
-      toast({ title: "Cancelled", description: "Wallet sign-in was cancelled." });
+      toast({
+        title: "Cancelled",
+        description: "Wallet sign-in was cancelled.",
+      });
     } finally {
       setLoading(false);
     }
@@ -148,16 +158,35 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
         </form>
 
         <div className="mt-4 border-t pt-4 space-y-2">
-          <p className="text-xs text-muted-foreground text-center">Quick login (dev only)</p>
+          <p className="text-xs text-muted-foreground text-center">
+            Quick login (dev only)
+          </p>
           <div className="flex gap-2">
             <Button
               type="button"
               variant="outline"
               className="flex-1 text-xs"
               disabled={loading}
-              onClick={() => signInWithCredentials("user@test.com", "password123").then((result) => {
-                if (!result.error) router.push(ROUTES.HOME);
-              })}
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const result = await signInWithCredentials(
+                    "user@test.com",
+                    "password123"
+                  );
+                  if (result.error) {
+                    toast({
+                      title: "Login failed",
+                      description: `${result.error.message}. Run 'npm run db:seed' to create test users.`,
+                      variant: "destructive",
+                    });
+                  } else {
+                    router.push(ROUTES.HOME);
+                  }
+                } finally {
+                  setLoading(false);
+                }
+              }}
             >
               Login as User
             </Button>
@@ -166,9 +195,26 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
               variant="outline"
               className="flex-1 text-xs"
               disabled={loading}
-              onClick={() => signInWithCredentials("manager@test.com", "password123").then((result) => {
-                if (!result.error) router.push(ROUTES.HOME);
-              })}
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const result = await signInWithCredentials(
+                    "manager@test.com",
+                    "password123"
+                  );
+                  if (result.error) {
+                    toast({
+                      title: "Login failed",
+                      description: `${result.error.message}. Run 'npm run db:seed' to create test users.`,
+                      variant: "destructive",
+                    });
+                  } else {
+                    router.push(ROUTES.HOME);
+                  }
+                } finally {
+                  setLoading(false);
+                }
+              }}
             >
               Login as Manager
             </Button>
@@ -176,7 +222,9 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
         </div>
 
         <div className="mt-4 border-t pt-4 space-y-3">
-          <p className="text-xs text-muted-foreground text-center">Or sign in with a wallet</p>
+          <p className="text-xs text-muted-foreground text-center">
+            Or sign in with a wallet
+          </p>
           <div className="flex flex-col items-center gap-2">
             <ConnectButton />
             {isConnected && (

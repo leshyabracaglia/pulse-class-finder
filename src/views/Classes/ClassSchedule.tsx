@@ -43,7 +43,7 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
             <div>
               <CardTitle className="text-xl">{classItem.title}</CardTitle>
               <CardDescription>
-                with {classItem.instructor_name || classItem.instructor_uid}
+                with {classItem.instructor_name}
               </CardDescription>
               {classItem.organization_name && (
                 <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
@@ -58,23 +58,31 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
           <div className="space-y-3 mb-4">
             <div className="flex items-center gap-2 text-gray-600">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">{formatDate(classItem.class_date)}</span>
+              <span className="text-sm">
+                {formatDate(classItem.class_date)}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Clock className="w-4 h-4" />
-              <span className="text-sm">{formatTime(classItem.class_time)}</span>
+              <span className="text-sm">
+                {formatTime(classItem.class_time)}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-gray-600">
               <Users className="w-4 h-4" />
               <span className="text-sm">
-                {classItem.current_bookings}/{classItem.max_capacity} spots filled
+                {classItem.current_bookings}/{classItem.max_capacity} spots
+                filled
               </span>
             </div>
           </div>
 
           <Button
             className="w-full"
-            onClick={(e) => { e.stopPropagation(); bookClass(classItem.id); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              bookClass(classItem.id);
+            }}
             disabled={isCompanyAdmin || isFull}
           >
             {isFull ? "Class Full" : "Book Class"}
@@ -107,8 +115,12 @@ export default function ClassSchedule() {
       const matchesSearch =
         !searchQuery ||
         c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.instructor_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.organization_name || "").toLowerCase().includes(searchQuery.toLowerCase());
+        (c.instructor_name || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (c.organization_name || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
       const matchesDate = !filterDate || c.class_date === filterDate;
       return matchesSearch && matchesDate;
     });
@@ -176,7 +188,10 @@ export default function ClassSchedule() {
             {hasFilters && (
               <Button
                 variant="outline"
-                onClick={() => { setSearchQuery(""); setFilterDate(""); }}
+                onClick={() => {
+                  setSearchQuery("");
+                  setFilterDate("");
+                }}
               >
                 Clear
               </Button>
@@ -199,7 +214,9 @@ export default function ClassSchedule() {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   No upcoming classes
                 </h3>
-                <p className="text-gray-600">Check back soon for new classes!</p>
+                <p className="text-gray-600">
+                  Check back soon for new classes!
+                </p>
               </>
             )}
           </div>
