@@ -7,6 +7,7 @@ import { useOrganizationContext } from "@/providers/OrganizationProvider";
 
 vi.mock("@/providers/ClassesProvider", () => ({ useClassesContext: vi.fn() }));
 vi.mock("@/providers/OrganizationProvider", () => ({ useOrganizationContext: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: vi.fn(() => ({ push: vi.fn() })) }));
 vi.mock("@/views/Classes/useUserLocation", () => ({
   default: () => ({
     location: { loading: false, latitude: null, error: null },

@@ -1,63 +1,54 @@
 const Footer = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-black border-t border-zinc-900 py-16">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Sage</h3>
-            <p className="text-gray-600 mb-4 max-w-md text-sm">
-              Sage is a professional class booking and management system for
-              fitness facilities to streamline operations and improve member
-              experience.
+            <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase font-mono mb-4">Movemint</p>
+            <p className="text-zinc-500 max-w-md text-sm leading-relaxed">
+              Crypto-native fitness booking. Instant studio settlements.
+              Earn <span className="text-white font-mono">$MOVE</span> tokens for every class you attend.
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
-              Pages
+            <h4 className="text-xs font-mono tracking-[0.25em] text-zinc-500 uppercase mb-6">
+              Navigate
             </h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-3 text-sm">
               <li>
-                <a
-                  href="/dashboard"
-                  className="hover:text-gray-900 transition-colors"
-                >
-                  Dashboard
-                </a>
+                <a href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">Dashboard</a>
               </li>
               <li>
-                <a href="/" className="hover:text-gray-900 transition-colors">
-                  Classes
-                </a>
+                <a href="/" className="text-zinc-400 hover:text-white transition-colors">Classes</a>
               </li>
               <li>
-                <a
-                  href="/profile"
-                  className="hover:text-gray-900 transition-colors"
-                >
-                  Profile
-                </a>
+                <a href="/profile" className="text-zinc-400 hover:text-white transition-colors">Profile</a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
-              Support
+            <h4 className="text-xs font-mono tracking-[0.25em] text-zinc-500 uppercase mb-6">
+              Studios
             </h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-3 text-sm">
               <li>
-                <a href="#" className="hover:text-gray-900 transition-colors">
-                  Contact Support
-                </a>
+                <a href="/create-organization" className="text-zinc-400 hover:text-white transition-colors">List Your Studio</a>
+              </li>
+              <li>
+                <a href="#" className="text-zinc-400 hover:text-white transition-colors">Support</a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-          <p className="text-sm text-gray-500">
-            &copy; 2025 Sage. All rights reserved.
+        <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs font-mono text-zinc-600 tracking-widest uppercase">
+            Movemint
+          </p>
+          <p className="text-xs font-mono text-zinc-700">
+            © 2025 Movemint. All rights reserved.
           </p>
         </div>
       </div>

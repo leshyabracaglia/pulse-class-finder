@@ -1,11 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { useAuthContext } from "./providers/AuthProvider";
-import { House } from "lucide-react";
-import { Button } from "./components/ui/legacy/button";
 import { ROUTES } from "./lib/routes";
 import { useEffect } from "react";
 import { useOrganizationContext } from "./providers/OrganizationProvider";
@@ -30,44 +27,59 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer border border-solid border-gray-200 rounded-full p-2 px-3">
-          <AvatarFallback>{fullName?.charAt(0).toUpperCase()}</AvatarFallback>
+        <Avatar className="cursor-pointer border border-zinc-800 rounded-none p-2 px-3 bg-zinc-900 text-white text-sm font-mono">
+          <AvatarFallback className="text-white">
+            {fullName?.charAt(0).toUpperCase()}
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent
+        align="end"
+        className="bg-zinc-950 border-zinc-800 text-white rounded-none"
+      >
         <DropdownMenuLabel>
           <div>
-            <p className="font-medium">{fullName}</p>
-            <p className="text-xs text-muted-foreground">{user?.email}</p>
+            <p className="font-medium text-white">{fullName}</p>
+            <p className="text-xs text-zinc-500 font-mono">{user?.email}</p>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuSeparator className="bg-zinc-800" />
+        <DropdownMenuItem asChild className="hover:bg-zinc-900 cursor-pointer">
           <Link href={ROUTES.PROFILE}>Profile</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href={ROUTES.DASHBOARD}>User Dashboard</Link>
+        <DropdownMenuItem asChild className="hover:bg-zinc-900 cursor-pointer">
+          <Link href={ROUTES.DASHBOARD}>Dashboard</Link>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-zinc-800" />
         {isCompanyAdmin ? (
           <>
-            <DropdownMenuItem asChild>
-              <Link href={ROUTES.ORGANIZATION_SETTINGS}>
-                Organization Settings
-              </Link>
+            <DropdownMenuItem
+              asChild
+              className="hover:bg-zinc-900 cursor-pointer"
+            >
+              <Link href={ROUTES.ORGANIZATION_SETTINGS}>Studio Settings</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={ROUTES.ORGANIZATION_CLASSES}>Organization Classes</Link>
+            <DropdownMenuItem
+              asChild
+              className="hover:bg-zinc-900 cursor-pointer"
+            >
+              <Link href={ROUTES.ORGANIZATION_CLASSES}>Studio Classes</Link>
             </DropdownMenuItem>
           </>
         ) : (
-          <DropdownMenuItem asChild>
-            <Link href={ROUTES.CREATE_ORGANIZATION}>Create Organization</Link>
+          <DropdownMenuItem
+            asChild
+            className="hover:bg-zinc-900 cursor-pointer"
+          >
+            <Link href={ROUTES.CREATE_ORGANIZATION}>List Your Studio</Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={signOut} className="cursor-pointer">
-          Logout
+        <DropdownMenuSeparator className="bg-zinc-800" />
+        <DropdownMenuItem
+          onClick={signOut}
+          className="cursor-pointer hover:bg-zinc-900 text-zinc-400"
+        >
+          Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -76,12 +88,13 @@ function UserMenu() {
 
 function AppHeader() {
   return (
-    <div className="border-b bg-background">
-      <div className="flex h-16 items-center px-4 flex-row justify-between">
-        <Link href={ROUTES.HOME}>
-          <Button variant="ghost" size="icon">
-            <House />
-          </Button>
+    <div className="border-b border-zinc-900 bg-black sticky top-0 z-50">
+      <div className="flex h-16 items-center px-6 justify-between">
+        <Link
+          href={ROUTES.HOME}
+          className="text-white font-bold tracking-[0.25em] text-sm uppercase"
+        >
+          MOVEMINT
         </Link>
         <UserMenu />
       </div>
@@ -100,7 +113,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [user, fetchOrganization, organization, loading]);
 
   return (
-    <div className="min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full bg-black">
       <main className="flex-1">
         <AppHeader />
         <div className="flex-1">{children}</div>

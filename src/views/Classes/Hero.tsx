@@ -1,41 +1,24 @@
 import { Button } from "@/components/ui/legacy/button";
 import { useAuthContext } from "@/providers/AuthProvider";
 
-function ListYourClassesCTA() {
+function ListYourStudioCTA() {
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 max-w-2xl mx-auto">
-      <h3 className="text-xl font-semibold mb-3">
-        Are you a wellness company?
+    <div className="border border-zinc-800 p-8 max-w-2xl">
+      <p className="text-xs tracking-[0.25em] text-zinc-500 uppercase font-mono mb-3">For Studios</p>
+      <h3 className="text-xl font-bold text-white mb-2">
+        List your classes on Movemint
       </h3>
-      <p className="text-blue-100 mb-4">
-        Join our platform to showcase your fitness classes and connect with
-        health-conscious customers.
+      <p className="text-zinc-500 text-sm mb-6 leading-relaxed">
+        Instant crypto settlements. No 30-day payout cycles. Reach wallet-native fitness enthusiasts.
       </p>
       <Button
-        variant="secondary"
-        className="bg-white text-blue-600 hover:bg-blue-50"
-        onClick={() => (window.location.href = "/company-dashboard")}
+        variant="outline"
+        className="border-white text-white bg-transparent hover:bg-white hover:text-black rounded-none font-mono text-xs tracking-widest uppercase px-6"
+        onClick={() => (window.location.href = "/create-organization")}
       >
-        List Your Classes
+        Apply Now →
       </Button>
     </div>
-  );
-}
-
-function BrowseClassesButton() {
-  return (
-    <Button
-      size="lg"
-      className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:scale-105"
-      onClick={() => {
-        const classesSection = document.getElementById("classes");
-        if (classesSection) {
-          classesSection.scrollIntoView({ behavior: "smooth" });
-        }
-      }}
-    >
-      Browse Classes
-    </Button>
   );
 }
 
@@ -43,41 +26,55 @@ export default function Hero() {
   const { user } = useAuthContext();
 
   return (
-    <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 text-white min-h-screen flex items-center">
-      <div className="container mx-auto px-4 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Sage
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-            Discover amazing fitness classes from top wellness companies. From
-            yoga to HIIT, find the perfect workout that fits your schedule and
-            goals.
+    <section className="bg-black text-white min-h-screen flex items-center border-b border-zinc-900">
+      <div className="container mx-auto px-6 py-24">
+        <div className="max-w-5xl">
+          <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase mb-10 font-mono">
+            Crypto-native fitness — Base Network
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <BrowseClassesButton />
+
+          <h1 className="text-8xl md:text-[10rem] font-black uppercase tracking-tighter leading-none mb-10 text-white">
+            MOVE<br />MINT
+          </h1>
+
+          <p className="text-zinc-400 text-lg max-w-lg mb-12 leading-relaxed">
+            Book classes from top studios. Pay in crypto.
+            Earn <span className="text-white font-mono">$MOVE</span> tokens for every session you complete.
+          </p>
+
+          <div className="flex flex-wrap gap-4 mb-24">
+            <Button
+              size="lg"
+              className="bg-white text-black hover:bg-zinc-200 rounded-none font-mono text-xs tracking-widest uppercase px-8"
+              onClick={() => {
+                document.getElementById("classes")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Browse Classes
+            </Button>
+
             {user ? (
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300"
+                className="border-zinc-700 text-white bg-transparent hover:bg-zinc-900 rounded-none font-mono text-xs tracking-widest uppercase px-8"
                 onClick={() => (window.location.href = "/dashboard")}
               >
-                My Dashboard
+                Dashboard
               </Button>
             ) : (
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300"
-                onClick={() => (window.location.href = "/auth")}
+                className="border-zinc-700 text-white bg-transparent hover:bg-zinc-900 rounded-none font-mono text-xs tracking-widest uppercase px-8"
+                onClick={() => (window.location.href = "/login")}
               >
-                Sign Up Today
+                Connect →
               </Button>
             )}
           </div>
 
-          <ListYourClassesCTA />
+          <ListYourStudioCTA />
         </div>
       </div>
     </section>

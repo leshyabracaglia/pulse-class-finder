@@ -58,6 +58,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Already booked" }, { status: 409 });
   }
 
+  const [classRow] = await db
+    .select({ max_capacity: classes.max_capacity })
+    .from(classes)
+    .where(eq(classes.id, class_id));
+
+  if (!classRow) {
+    return NextResponse.json({ error: "Class not found" }, { status: 404 });
+  }
+
+  const confirmedBookings = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(and(eq(bookings.class_id, class_id), eq(bookings.booking_status, "confirmed")));
+
+  if (confirmedBookings.length >= classRow.max_capacity) {
+    return NextResponse.json({ error: "Class is full" }, { status: 409 });
+  }
+
   const id = crypto.randomUUID();
   await db.insert(bookings).values({
     id,

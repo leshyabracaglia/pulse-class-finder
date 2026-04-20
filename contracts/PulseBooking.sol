@@ -5,29 +5,43 @@ contract PulseBooking {
     mapping(bytes32 => uint256) public classMaxCapacity;
     mapping(bytes32 => uint256) public activeBookingCount;
     mapping(bytes32 => mapping(address => bool)) public hasBooked;
+    mapping(bytes32 => uint256) public classPrice; // in wei
+    mapping(bytes32 => address payable) public studioWallet;
 
-    event ClassRegistered(bytes32 indexed classId, uint256 maxCapacity);
-    event ClassBooked(bytes32 indexed classId, address indexed user);
+    event ClassRegistered(bytes32 indexed classId, uint256 maxCapacity, uint256 priceWei);
+    event ClassBooked(bytes32 indexed classId, address indexed user, uint256 paid);
     event BookingCancelled(bytes32 indexed classId, address indexed user);
 
-    /// Called by org admin when creating a class (permissionless for simplicity)
-    function registerClass(bytes32 classId, uint256 maxCapacity) external {
+    function registerClass(
+        bytes32 classId,
+        uint256 maxCapacity,
+        uint256 priceWei,
+        address payable wallet
+    ) external {
         require(maxCapacity > 0, "Capacity must be > 0");
         classMaxCapacity[classId] = maxCapacity;
-        emit ClassRegistered(classId, maxCapacity);
+        classPrice[classId] = priceWei;
+        studioWallet[classId] = wallet;
+        emit ClassRegistered(classId, maxCapacity, priceWei);
     }
 
-    /// Called by a user to book a spot
-    function bookClass(bytes32 classId) external {
+    function bookClass(bytes32 classId) external payable {
         require(classMaxCapacity[classId] > 0, "Class not registered");
         require(!hasBooked[classId][msg.sender], "Already booked");
         require(activeBookingCount[classId] < classMaxCapacity[classId], "Class full");
+        require(msg.value >= classPrice[classId], "Insufficient payment");
+
         hasBooked[classId][msg.sender] = true;
         activeBookingCount[classId]++;
-        emit ClassBooked(classId, msg.sender);
+
+        // Instant settlement: forward payment directly to the studio
+        if (msg.value > 0 && studioWallet[classId] != address(0)) {
+            studioWallet[classId].transfer(msg.value);
+        }
+
+        emit ClassBooked(classId, msg.sender, msg.value);
     }
 
-    /// Called by a user to cancel their booking
     function cancelBooking(bytes32 classId) external {
         require(hasBooked[classId][msg.sender], "No booking found");
         hasBooked[classId][msg.sender] = false;

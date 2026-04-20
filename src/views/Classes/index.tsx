@@ -5,13 +5,11 @@ import Footer from "@/views/Classes/Footer";
 
 export default function Index() {
   return (
-    <div className="min-h-screen">
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">Sage</h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Find your perfect fitness class
-          </p>
+    <div className="min-h-screen bg-black">
+      <div className="border-b border-zinc-900 py-16 px-6">
+        <div className="container mx-auto">
+          <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase font-mono mb-4">Classes</p>
+          <h2 className="text-4xl font-black uppercase tracking-tight text-white">Browse Sessions</h2>
         </div>
       </div>
       <div id="classes">
