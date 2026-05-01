@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -33,13 +33,7 @@ const UserPackages = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (user) {
-      fetchUserPackages();
-    }
-  }, [user]);
-
-  const fetchUserPackages = async () => {
+  const fetchUserPackages = useCallback(async () => {
     try {
       const res = await fetch("/api/user-packages");
       if (!res.ok) throw new Error("Failed to fetch user packages");
@@ -55,7 +49,13 @@ const UserPackages = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserPackages();
+    }
+  }, [user, fetchUserPackages]);
 
   const isPackageExpired = (expiresAt: string | null) => {
     if (!expiresAt) return false;

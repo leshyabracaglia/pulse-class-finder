@@ -56,7 +56,7 @@ function AddEditClassForm({
       current_bookings: editingClass?.current_bookings || 0,
       image_url: editingClass?.image_url || null,
     });
-  }, [editingClass]);
+  }, [editingClass, organization.organization_uid]);
 
   const handleSubmitClass = async (e: React.FormEvent) => {
     e.preventDefault();
