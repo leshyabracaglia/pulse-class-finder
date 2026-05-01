@@ -4,10 +4,10 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
-            <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase font-mono mb-4">Movemint</p>
-            <p className="text-zinc-500 max-w-md text-sm leading-relaxed">
+            <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase font-mono mb-4">Solstice</p>
+            <p className="text-zinc-500 max-w-md text-sm leading-relaxed font-display">
               Crypto-native fitness booking. Instant studio settlements.
-              Earn <span className="text-white font-mono">$MOVE</span> tokens for every class you attend.
+              Earn <span className="text-white font-mono">$SLST</span> tokens for every class you attend.
             </p>
           </div>
 
@@ -45,10 +45,10 @@ const Footer = () => {
 
         <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs font-mono text-zinc-600 tracking-widest uppercase">
-            Movemint
+            Solstice
           </p>
           <p className="text-xs font-mono text-zinc-700">
-            © 2025 Movemint. All rights reserved.
+            © {new Date().getFullYear()} Solstice. All rights reserved.
           </p>
         </div>
       </div>

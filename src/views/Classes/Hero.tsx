@@ -6,9 +6,9 @@ function ListYourStudioCTA() {
     <div className="border border-zinc-800 p-8 max-w-2xl">
       <p className="text-xs tracking-[0.25em] text-zinc-500 uppercase font-mono mb-3">For Studios</p>
       <h3 className="text-xl font-bold text-white mb-2">
-        List your classes on Movemint
+        List your classes on Solstice
       </h3>
-      <p className="text-zinc-500 text-sm mb-6 leading-relaxed">
+      <p className="text-zinc-500 text-sm mb-6 leading-relaxed font-display">
         Instant crypto settlements. No 30-day payout cycles. Reach wallet-native fitness enthusiasts.
       </p>
       <Button
@@ -34,12 +34,12 @@ export default function Hero() {
           </p>
 
           <h1 className="text-8xl md:text-[10rem] font-black uppercase tracking-tighter leading-none mb-10 text-white">
-            MOVE<br />MINT
+            SOL<br />STICE
           </h1>
 
-          <p className="text-zinc-400 text-lg max-w-lg mb-12 leading-relaxed">
+          <p className="text-zinc-400 text-lg max-w-lg mb-12 leading-relaxed font-display">
             Book classes from top studios. Pay in crypto.
-            Earn <span className="text-white font-mono">$MOVE</span> tokens for every session you complete.
+            Earn <span className="text-white font-mono">$SLST</span> tokens for every session you complete.
           </p>
 
           <div className="flex flex-wrap gap-4 mb-24">

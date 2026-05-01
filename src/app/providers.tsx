@@ -19,7 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider appInfo={{ appName: "Solstice", learnMoreUrl: "https://solstice.fit" }}>
           <SessionProvider>
             <AuthProvider>
               <ClassesProvider>

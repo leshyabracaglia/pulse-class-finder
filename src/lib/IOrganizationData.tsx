@@ -6,4 +6,6 @@ export interface IOrganizationData {
   phone: string;
   address: string;
   website: string;
+  logo_url?: string | null;
+  wallet_address?: string | null;
 }

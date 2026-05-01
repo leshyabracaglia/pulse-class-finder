@@ -94,7 +94,7 @@ function AppHeader() {
           href={ROUTES.HOME}
           className="text-white font-bold tracking-[0.25em] text-sm uppercase"
         >
-          MOVEMINT
+          SOLSTICE
         </Link>
         <UserMenu />
       </div>

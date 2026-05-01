@@ -77,7 +77,7 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
       const message = new SiweMessage({
         domain: window.location.host,
         address,
-        statement: "Sign in to Pulse Class Finder",
+        statement: "Sign in to Solstice",
         uri: window.location.origin,
         version: "1",
         chainId: chain.id,
@@ -157,6 +157,7 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
           </Button>
         </form>
 
+        {process.env.NODE_ENV === "development" && (
         <div className="mt-4 border-t pt-4 space-y-2">
           <p className="text-xs text-muted-foreground text-center">
             Quick login (dev only)
@@ -220,6 +221,7 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
             </Button>
           </div>
         </div>
+        )}
 
         <div className="mt-4 border-t pt-4 space-y-3">
           <p className="text-xs text-muted-foreground text-center">

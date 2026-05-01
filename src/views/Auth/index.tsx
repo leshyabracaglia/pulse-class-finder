@@ -26,7 +26,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4">
-      <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase font-mono mb-10">MOVEMINT</p>
+      <p className="text-xs tracking-[0.35em] text-zinc-500 uppercase font-mono mb-10">SOLSTICE</p>
       {mode === AUTH_MODES.SIGNIN ? (
         <SignInForm onToggleMode={toggleMode} />
       ) : (
