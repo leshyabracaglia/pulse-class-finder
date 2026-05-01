@@ -24,6 +24,10 @@ jobs:
         env:
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
 
+      - run: npx drizzle-kit push
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+
       - run: npx vercel deploy --prod --token ${{ secrets.VERCEL_TOKEN }} --yes
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

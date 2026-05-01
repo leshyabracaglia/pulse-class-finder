@@ -85,7 +85,6 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
       });
       const signature = await signMessageAsync({
         message: message.prepareMessage(),
-        account: address,
       });
       const result = await signIn("siwe", {
         message: JSON.stringify(message),
@@ -101,10 +100,15 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
       } else {
         router.push(ROUTES.HOME);
       }
-    } catch {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      const cancelled = message.toLowerCase().includes("user rejected") ||
+        message.toLowerCase().includes("cancelled") ||
+        message.toLowerCase().includes("denied");
       toast({
-        title: "Cancelled",
-        description: "Wallet sign-in was cancelled.",
+        title: cancelled ? "Cancelled" : "Error",
+        description: cancelled ? "Wallet sign-in was cancelled." : message,
+        variant: cancelled ? "default" : "destructive",
       });
     } finally {
       setLoading(false);
