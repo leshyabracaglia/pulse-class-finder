@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const { title, class_time, class_date, max_capacity, instructor_uid, organization_uid, image_url } = body;
+  const { title, class_time, class_date, max_capacity, price_cents, instructor_uid, organization_uid, image_url } = body;
 
   const id = crypto.randomUUID();
   await db.insert(classes).values({
@@ -74,8 +74,9 @@ export async function POST(req: NextRequest) {
     class_date,
     class_time,
     max_capacity: Number(max_capacity),
+    price_cents: Number(price_cents || 0),
     image_url: image_url || null,
   });
 
-  return NextResponse.json({ id, organization_uid, instructor_uid, title, class_date, class_time, max_capacity, image_url: image_url || null });
+  return NextResponse.json({ id, organization_uid, instructor_uid, title, class_date, class_time, max_capacity, price_cents: Number(price_cents || 0), current_bookings: 0, image_url: image_url || null });
 }

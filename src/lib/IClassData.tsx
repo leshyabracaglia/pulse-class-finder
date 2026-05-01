@@ -15,6 +15,7 @@ export interface IClassData {
   class_time: string;
   class_date: string;
   max_capacity: number;
+  price_cents: number;
   current_bookings: number;
   instructor_name?: string;
   organization_name?: string;

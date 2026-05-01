@@ -26,13 +26,15 @@ export const PULSE_BOOKING_ABI = [
     inputs: [
       { name: "classId", type: "bytes32" },
       { name: "maxCapacity", type: "uint256" },
+      { name: "priceWei", type: "uint256" },
+      { name: "wallet", type: "address" },
     ],
     outputs: [],
   },
   {
     name: "bookClass",
     type: "function",
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     inputs: [{ name: "classId", type: "bytes32" }],
     outputs: [],
   },

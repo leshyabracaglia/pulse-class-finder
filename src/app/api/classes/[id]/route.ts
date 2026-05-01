@@ -30,11 +30,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const { title, class_time, class_date, max_capacity, instructor_uid, image_url } = body;
+  const { title, class_time, class_date, max_capacity, price_cents, instructor_uid, image_url } = body;
 
   await db
     .update(classes)
-    .set({ title, class_time, class_date, max_capacity: Number(max_capacity), instructor_uid, image_url: image_url ?? null })
+    .set({ title, class_time, class_date, max_capacity: Number(max_capacity), price_cents: Number(price_cents || 0), instructor_uid, image_url: image_url ?? null })
     .where(eq(classes.id, id));
 
   return NextResponse.json({ success: true });

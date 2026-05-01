@@ -88,23 +88,23 @@ const UserDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-lg">Loading your dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-background">
+      <div className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <User className="w-8 h-8 text-blue-600" />
+            <User className="w-8 h-8 text-accent" />
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-foreground">
                 My Dashboard
               </h1>
-              <p className="text-sm text-gray-600">{user?.email}</p>
+              <p className="text-sm text-zinc-400">{user?.email}</p>
             </div>
           </div>
           <Button variant="outline" onClick={() => router.push("/home")}>
@@ -115,20 +115,20 @@ const UserDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             My Booked Classes
           </h2>
-          <p className="text-gray-600">Manage your upcoming fitness classes</p>
+          <p className="text-zinc-400 font-display">Manage your upcoming fitness classes</p>
         </div>
 
         {bookings.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <Calendar className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 No classes booked
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-zinc-400 mb-4 font-display">
                 You haven't booked any classes yet.
               </p>
               <Button onClick={() => router.push("/home")}>
@@ -157,25 +157,25 @@ const UserDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-zinc-400">
                       <Calendar className="w-4 h-4" />
-                      <span className="text-sm">
+                      <span className="text-sm font-numeric">
                         {formatDate(booking.class_date)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-zinc-400">
                       <Clock className="w-4 h-4" />
-                      <span className="text-sm">
+                      <span className="text-sm font-numeric">
                         {formatTime(booking.class_time)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-zinc-400">
                       <Users className="w-4 h-4" />
                       <span className="text-sm">Booking confirmed</span>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-zinc-500 font-numeric">
                       Booked on{" "}
                       {new Date(booking.booked_at).toLocaleDateString()}
                     </p>

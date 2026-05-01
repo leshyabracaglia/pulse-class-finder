@@ -38,6 +38,7 @@ function AddEditClassForm({
     class_time: editingClass?.class_time || "",
     class_date: editingClass?.class_date || "",
     max_capacity: editingClass?.max_capacity || 0,
+    price_cents: editingClass?.price_cents || 0,
     current_bookings: editingClass?.current_bookings || 0,
     image_url: editingClass?.image_url || null,
   });
@@ -51,6 +52,7 @@ function AddEditClassForm({
       class_time: editingClass?.class_time || "",
       class_date: editingClass?.class_date || "",
       max_capacity: editingClass?.max_capacity || 0,
+      price_cents: editingClass?.price_cents || 0,
       current_bookings: editingClass?.current_bookings || 0,
       image_url: editingClass?.image_url || null,
     });
@@ -63,7 +65,7 @@ function AddEditClassForm({
     try {
       const success = editingClass
         ? await updateClass(classData)
-        : await createClass(classData);
+        : await createClass({ ...classData, org_wallet: organization.wallet_address });
 
       if (!success) {
         toast({
@@ -165,6 +167,23 @@ function AddEditClassForm({
               required
             />
           </div>
+          <div>
+            <Label htmlFor="price">Price (USD)</Label>
+            <Input
+              id="price"
+              type="number"
+              step="0.01"
+              min="0"
+              value={(classData.price_cents / 100).toFixed(2)}
+              onChange={(e) =>
+                setClassData({
+                  ...classData,
+                  price_cents: Math.round(Number(e.target.value) * 100),
+                })
+              }
+              placeholder="0.00"
+            />
+          </div>
           <div className="md:col-span-2">
             <Label htmlFor="imageUrl">Class Image URL (optional)</Label>
             <Input
@@ -249,7 +268,7 @@ function ClassCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-zinc-600">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             <span>{new Date(classItem.class_date).toLocaleDateString()}</span>
@@ -275,7 +294,7 @@ export default function OrganizationClassesDisplay() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
         <div className="text-lg">Loading your company dashboard...</div>
       </div>
     );
@@ -285,8 +304,8 @@ export default function OrganizationClassesDisplay() {
     <>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Your Classes</h2>
-          <p className="text-gray-600">Manage your fitness classes</p>
+          <h2 className="text-2xl font-bold text-zinc-900">Your Classes</h2>
+          <p className="text-zinc-600">Manage your fitness classes</p>
         </div>
         <Button onClick={() => { setEditingClass(null); setShowAddClass(true); }}>
           <Plus className="w-4 h-4 mr-2" />
@@ -302,11 +321,11 @@ export default function OrganizationClassesDisplay() {
       {organizationClasses.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <Calendar className="w-12 h-12 text-zinc-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-zinc-900 mb-2">
               No classes yet
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-zinc-600 mb-4">
               Start by creating your first fitness class.
             </p>
             <Button onClick={() => { setEditingClass(null); setShowAddClass(true); }}>

@@ -18,7 +18,7 @@ const CoreInput = forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
     );
   }
 );
-Input.displayName = "Input";
+CoreInput.displayName = "CoreInput";
 
 export function Input({
   label,

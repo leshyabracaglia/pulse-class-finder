@@ -2,6 +2,8 @@
 
 import React, { useMemo, useState } from "react";
 import ClassDetailDialog from "./ClassDetailDialog";
+import BookingConfirmDialog from "./BookingConfirmDialog";
+import BookingConfirmationDialog from "./BookingConfirmationDialog";
 import { Button } from "@/components/ui/legacy/button";
 import {
   Card,
@@ -22,20 +24,27 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
   const { organization } = useOrganizationContext();
   const { bookClass } = useClassesContext();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmingClass, setConfirmingClass] = useState<IClassData | null>(null);
+  const [confirmedClass, setConfirmedClass] = useState<IClassData | null>(null);
+  const [booking, setBooking] = useState(false);
 
   const isCompanyAdmin = !!organization;
   const isFull = classItem.current_bookings >= classItem.max_capacity;
 
   const handleBook = async () => {
-    await bookClass(classItem.id);
+    setBooking(true);
+    const success = await bookClass(classItem.id);
+    setBooking(false);
     setDialogOpen(false);
+    setConfirmingClass(null);
+    if (success) setConfirmedClass(classItem);
   };
 
   return (
     <>
       <Card
         key={classItem.id}
-        className="hover:shadow-lg transition-shadow cursor-pointer"
+        className="shadow-lg transition-shadow cursor-pointer"
         onClick={() => setDialogOpen(true)}
       >
         <CardHeader>
@@ -46,7 +55,7 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
                 with {classItem.instructor_name}
               </CardDescription>
               {classItem.organization_name && (
-                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                <p className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
                   <Building className="w-3 h-3" />
                   {classItem.organization_name}
                 </p>
@@ -56,21 +65,21 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-zinc-400">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">
+              <span className="text-sm font-numeric">
                 {formatDate(classItem.class_date)}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-zinc-400">
               <Clock className="w-4 h-4" />
-              <span className="text-sm">
+              <span className="text-sm font-numeric">
                 {formatTime(classItem.class_time)}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-zinc-400">
               <Users className="w-4 h-4" />
-              <span className="text-sm">
+              <span className="text-sm font-numeric">
                 {classItem.current_bookings}/{classItem.max_capacity} spots
                 filled
               </span>
@@ -81,7 +90,7 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
             className="w-full"
             onClick={(e) => {
               e.stopPropagation();
-              bookClass(classItem.id);
+              setConfirmingClass(classItem);
             }}
             disabled={isCompanyAdmin || isFull}
           >
@@ -93,8 +102,20 @@ function ClassCard({ classItem }: { classItem: IClassData }) {
         classItem={classItem}
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onBook={handleBook}
+        onBook={() => { setDialogOpen(false); setConfirmingClass(classItem); }}
         isCompanyAdmin={isCompanyAdmin}
+      />
+      <BookingConfirmDialog
+        classItem={confirmingClass}
+        open={!!confirmingClass}
+        loading={booking}
+        onConfirm={handleBook}
+        onClose={() => setConfirmingClass(null)}
+      />
+      <BookingConfirmationDialog
+        classItem={confirmedClass}
+        open={!!confirmedClass}
+        onClose={() => setConfirmedClass(null)}
       />
     </>
   );
@@ -130,7 +151,7 @@ export default function ClassSchedule() {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="text-lg">Loading classes...</div>
@@ -141,10 +162,10 @@ export default function ClassSchedule() {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
             Upcoming Classes
           </h2>
 
@@ -201,20 +222,22 @@ export default function ClassSchedule() {
 
         {filteredClasses.length === 0 ? (
           <div className="text-center py-12">
-            <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <Calendar className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
             {hasFilters ? (
               <>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
                   No matching classes
                 </h3>
-                <p className="text-gray-600">Try clearing your filters.</p>
+                <p className="text-zinc-400 font-display">
+                  Try clearing your filters.
+                </p>
               </>
             ) : (
               <>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-foreground mb-2">
                   No upcoming classes
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-zinc-400 font-display">
                   Check back soon for new classes!
                 </p>
               </>

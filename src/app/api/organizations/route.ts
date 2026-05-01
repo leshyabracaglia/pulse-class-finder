@@ -27,6 +27,7 @@ export async function GET() {
     address: o.address,
     website: o.website,
     wallet_address: o.wallet_address,
+    logo_url: o.logo_url ?? null,
   });
 }
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const { name, description, contactEmail, phone, address, website, wallet_address } = body;
+  const { name, description, contactEmail, phone, address, website, wallet_address, logo_url } = body;
 
   const organization_uid = crypto.randomUUID();
   await db.insert(organizations).values({
@@ -53,9 +54,10 @@ export async function POST(req: NextRequest) {
     address,
     website,
     wallet_address: wallet_address || null,
+    logo_url: logo_url || null,
   });
 
-  return NextResponse.json({ organization_uid, name, description, contactEmail, phone, address, website, wallet_address: wallet_address || null });
+  return NextResponse.json({ organization_uid, name, description, contactEmail, phone, address, website, wallet_address: wallet_address || null, logo_url: logo_url || null });
 }
 
 export async function PUT(req: NextRequest) {
@@ -68,11 +70,11 @@ export async function PUT(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const { organization_uid, name, description, contactEmail, phone, address, website, wallet_address } = body;
+  const { organization_uid, name, description, contactEmail, phone, address, website, wallet_address, logo_url } = body;
 
   await db
     .update(organizations)
-    .set({ name, description, contact_email: contactEmail, phone_number: phone, address, website, wallet_address: wallet_address ?? null })
+    .set({ name, description, contact_email: contactEmail, phone_number: phone, address, website, wallet_address: wallet_address ?? null, logo_url: logo_url ?? null })
     .where(and(eq(organizations.organization_uid, organization_uid), eq(organizations.admin_uid, session.user.id)));
 
   return NextResponse.json({ success: true });

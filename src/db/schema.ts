@@ -20,6 +20,7 @@ export const organizations = pgTable("organizations", {
   organization_uid: text("organization_uid").primaryKey(),
   admin_uid: text("admin_uid").notNull(),
   name: text("name").notNull(),
+  logo_url: text("logo_url"),
   wallet_address: text("wallet_address"),
   description: text("description"),
   contact_email: text("contact_email"),
@@ -46,6 +47,7 @@ export const classes = pgTable("classes", {
   class_date: text("class_date").notNull(),
   class_time: text("class_time").notNull(),
   max_capacity: integer("max_capacity").notNull(),
+  price_cents: integer("price_cents").default(0).notNull(),
   image_url: text("image_url"),
   created_at: timestamp("created_at").defaultNow(),
 });

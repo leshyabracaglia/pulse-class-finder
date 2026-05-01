@@ -60,6 +60,7 @@ async function seed() {
       contact_email: "manager@test.com",
       phone_number: "555-0100",
       address: "123 Main St, San Francisco, CA",
+      logo_url: "https://picsum.photos/seed/pulsefitness/200/200",
     })
     .onConflictDoNothing();
 

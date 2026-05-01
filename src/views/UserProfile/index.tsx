@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/legacy/button";
 import { Input } from "@/components/ui/Input";
@@ -33,6 +33,30 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [fullName, setFullName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image under 1MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Coming soon",
+      description: "Photo upload will be available in a future update.",
+    });
+  };
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -134,7 +158,14 @@ export default function UserProfile() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <Button variant="outline" size="sm">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handlePhotoChange}
+                    accept="image/jpeg,image/png,image/gif"
+                    className="hidden"
+                  />
+                  <Button variant="outline" size="sm" onClick={handlePhotoClick}>
                     Change Photo
                   </Button>
                   <p className="text-sm text-gray-500 mt-1">

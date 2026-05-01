@@ -21,28 +21,15 @@ interface IUpdateOrganizationData {
   phone: string;
   address: string;
   website: string;
+  logo_url?: string | null;
 }
 
 interface IOrganizationContext {
   organization: IOrganizationData | null;
   organizationClasses: IClassData[] | null;
   fetchOrganization: () => void;
-  createOrganization: ({
-    name,
-    description,
-    contactEmail,
-    phone,
-    address,
-    website,
-  }: IUpdateOrganizationData) => Promise<boolean>;
-  updateOrganization: ({
-    name,
-    description,
-    contactEmail,
-    phone,
-    address,
-    website,
-  }: IUpdateOrganizationData) => Promise<boolean>;
+  createOrganization: (data: IUpdateOrganizationData) => Promise<boolean>;
+  updateOrganization: (data: IUpdateOrganizationData) => Promise<boolean>;
 }
 
 const OrganizationContext = createContext<IOrganizationContext | undefined>(
@@ -79,7 +66,8 @@ export default function OrganizationProvider({
     if (!user) return null;
     try {
       const res = await fetch("/api/organizations");
-      if (!res.ok) throw new Error("Failed to fetch organization");
+      if (res.status === 401) return null; // not logged in yet — no-op
+      if (!res.ok) throw new Error(`Failed to fetch organization: ${res.status}`);
       const data = await res.json();
       setOrganization(data);
       return data;
@@ -89,19 +77,12 @@ export default function OrganizationProvider({
     }
   }, [user]);
 
-  async function createOrganization({
-    name,
-    description,
-    contactEmail,
-    phone,
-    address,
-    website,
-  }: IUpdateOrganizationData) {
+  async function createOrganization({ name, description, contactEmail, phone, address, website, logo_url }: IUpdateOrganizationData) {
     try {
       const res = await fetch("/api/organizations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description, contactEmail, phone, address, website }),
+        body: JSON.stringify({ name, description, contactEmail, phone, address, website, logo_url }),
       });
 
       if (!res.ok) throw new Error("Failed to create organization");
@@ -115,6 +96,8 @@ export default function OrganizationProvider({
         phone: data.phone,
         address: data.address,
         website: data.website,
+        wallet_address: data.wallet_address ?? null,
+        logo_url: data.logo_url ?? null,
       });
       return true;
     } catch (error) {
@@ -123,14 +106,7 @@ export default function OrganizationProvider({
     }
   }
 
-  async function updateOrganization({
-    name,
-    description,
-    contactEmail,
-    phone,
-    address,
-    website,
-  }: IUpdateOrganizationData) {
+  async function updateOrganization({ name, description, contactEmail, phone, address, website, logo_url }: IUpdateOrganizationData) {
     if (!organization) return false;
     try {
       const res = await fetch("/api/organizations", {
@@ -144,6 +120,7 @@ export default function OrganizationProvider({
           phone,
           address,
           website,
+          logo_url: logo_url ?? null,
         }),
       });
 
@@ -157,13 +134,14 @@ export default function OrganizationProvider({
       }
 
       setOrganization({
-        organization_uid: organization.organization_uid,
+        ...organization,
         name,
         description,
         contactEmail,
         phone,
         address,
         website,
+        logo_url: logo_url ?? null,
       });
       toast({
         title: "Success",

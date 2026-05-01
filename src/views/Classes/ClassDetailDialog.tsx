@@ -41,7 +41,7 @@ export default function ClassDetailDialog({
             className="w-full h-48 object-cover"
           />
         ) : (
-          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+          <div className="w-full h-48 bg-muted flex items-center justify-center">
             <Dumbbell className="w-16 h-16 text-gray-300" />
           </div>
         )}
@@ -50,7 +50,7 @@ export default function ClassDetailDialog({
           <DialogHeader>
             <DialogTitle className="text-2xl">{classItem.title}</DialogTitle>
             {classItem.organization_name && (
-              <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+              <p className="text-sm text-zinc-500 flex items-center gap-1 mt-1">
                 <Building className="w-3 h-3" />
                 {classItem.organization_name}
               </p>
@@ -58,24 +58,24 @@ export default function ClassDetailDialog({
           </DialogHeader>
 
           <div className="space-y-3 my-4">
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-zinc-400">
               <Calendar className="w-4 h-4" />
-              <span className="text-sm">{formatDate(classItem.class_date)}</span>
+              <span className="text-sm font-numeric">{formatDate(classItem.class_date)}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-zinc-400">
               <Clock className="w-4 h-4" />
-              <span className="text-sm">{formatTime(classItem.class_time)}</span>
+              <span className="text-sm font-numeric">{formatTime(classItem.class_time)}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-zinc-400">
               <Users className="w-4 h-4" />
-              <span className="text-sm">
+              <span className="text-sm font-numeric">
                 {classItem.current_bookings}/{classItem.max_capacity} spots filled
               </span>
             </div>
           </div>
 
           {/* Instructor row */}
-          <div className="flex items-center gap-3 py-3 border-t border-gray-100">
+          <div className="flex items-center gap-3 py-3 border-t border-border">
             {classItem.instructor_photo_url ? (
               <img
                 src={classItem.instructor_photo_url}
@@ -87,11 +87,11 @@ export default function ClassDetailDialog({
                 className="w-10 h-10 rounded-full object-cover"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <User className="w-5 h-5 text-gray-400" />
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                <User className="w-5 h-5 text-zinc-600" />
               </div>
             )}
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-zinc-300">
               {typeof classItem.instructor_name === "object"
                 ? (classItem.instructor_name as { name?: string })?.name
                 : classItem.instructor_name || classItem.instructor_uid}

@@ -11,14 +11,17 @@ import {
   PULSE_BOOKING_ABI,
   classIdToBytes32,
 } from "@/lib/contracts";
+import { priceCentsToWei } from "@/lib/utils";
 
 interface ICreateClassData {
   title: string;
   class_time: string;
   class_date: string;
   max_capacity: number;
+  price_cents: number;
   instructor_uid: string;
   organization_uid: string;
+  org_wallet?: string | null;
   image_url?: string | null;
 }
 
@@ -62,8 +65,10 @@ export default function ClassesProvider({
     class_time,
     class_date,
     max_capacity,
+    price_cents,
     instructor_uid,
     organization_uid,
+    org_wallet,
     image_url,
   }: ICreateClassData) {
     if (!organization_uid) {
@@ -79,7 +84,7 @@ export default function ClassesProvider({
       const res = await fetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, class_time, class_date, max_capacity, instructor_uid, organization_uid, image_url: image_url || null }),
+        body: JSON.stringify({ title, class_time, class_date, max_capacity, price_cents, instructor_uid, organization_uid, image_url: image_url || null }),
       });
 
       if (!res.ok) throw new Error("Failed to create class");
@@ -95,7 +100,12 @@ export default function ClassesProvider({
               address: BOOKING_CONTRACT_ADDRESS,
               abi: PULSE_BOOKING_ABI,
               functionName: "registerClass",
-              args: [classIdToBytes32(created.id), BigInt(max_capacity)],
+              args: [
+                classIdToBytes32(created.id),
+                BigInt(max_capacity),
+                priceCentsToWei(price_cents),
+                (org_wallet || "0x0000000000000000000000000000000000000000") as `0x${string}`,
+              ],
               account: address,
               chain,
             });
@@ -168,15 +178,17 @@ export default function ClassesProvider({
     }
 
     try {
-      // If the booking contract is deployed, record the booking on-chain first
+      // If the booking contract is deployed, pay and record on-chain
       if (BOOKING_CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000") {
         const { address, chain } = getAccount(wagmiConfig);
         if (address && chain) {
+          const priceWei = priceCentsToWei(classItem.price_cents || 0);
           const hash = await writeContract(wagmiConfig, {
             address: BOOKING_CONTRACT_ADDRESS,
             abi: PULSE_BOOKING_ABI,
             functionName: "bookClass",
             args: [classIdToBytes32(classId)],
+            value: priceWei,
             account: address,
             chain,
           });
