@@ -73,7 +73,9 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
     if (!address || !chain) return;
     setLoading(true);
     try {
-      const { nonce } = await fetch("/api/auth/nonce").then((r) => r.json());
+      const nonceRes = await fetch("/api/auth/nonce");
+      if (!nonceRes.ok) throw new Error(`Nonce request failed (${nonceRes.status})`);
+      const { nonce } = await nonceRes.json();
       const message = new SiweMessage({
         domain: window.location.host,
         address,
@@ -85,6 +87,7 @@ export default function SignInForm({ onToggleMode }: SignInFormProps) {
       });
       const signature = await signMessageAsync({
         message: message.prepareMessage(),
+        account: address,
       });
       const result = await signIn("siwe", {
         message: JSON.stringify(message),
